@@ -12,8 +12,8 @@ I'm Abhishek Paul, a passionate and aspiring Data Analyst and Flutter Devveloper
 
 ## Projects
 
-- 📊 [Data Analytics Project 1](link-to-repo) - Brief description of the project.
-- 📈 [Data Analytics Project 2](link-to-repo) - Brief description of the project.
+- 📊 [ML Project ](https://github.com/abhip2565/M-Bagging) - M-Bagging, a new modified bagging approach to optimize clssification making use hetero-classifiers.
+- 📈 [Data Analytics Project ](https://github.com/abhip2565/MVT-Impute) -A new simple, interpolation based null value prediction algorithm for time-series data.
 - 📱 [Flutter Project 1](link-to-repo) - Brief description of the project.
 - 🎉 [Flutter Project 2](link-to-repo) - Brief description of the project.
 
