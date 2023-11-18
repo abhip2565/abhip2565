@@ -14,9 +14,8 @@ I'm Abhishek Paul, a passionate and aspiring Data Analyst and Flutter Devveloper
 
 - 📊 [ML Project ](https://github.com/abhip2565/M-Bagging) - M-Bagging, a new modified bagging approach to optimize clssification making use hetero-classifiers.
 - 📈 [Data Analytics Project ](https://github.com/abhip2565/MVT-Impute) -A new simple, interpolation based null value prediction algorithm for time-series data.
-- 📱 [Flutter Project 1](https://github.com/Sweta040799/PIGEONS) - Brief description of the project.
-- 🎉 [Flutter Project 2](https://github.com/abhip2565/Patient-Assistant) - Brief description of the project.
-
+- 📱 [Flutter Project 1](https://github.com/Sweta040799/PIGEONS) - All in one streaming solution.
+- 🎉 [Flutter Project 2](https://github.com/abhip2565/Patient-Assistant) - Full stack cross platform mobile application to ease out the process of taking and managing your doctor’s appointments.
 ## Let's Connect
 
 - 📧 Feel free to reach out to me at paul.apaul.abhishek.ap@gmail.com
