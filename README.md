@@ -66,6 +66,26 @@ I'm a **Software Engineer** based in **Kolkata, India** 🇮🇳, passionate abo
 
 ---
 
+## 🌍 Open Source Contributions
+
+### [Inji](https://github.com/inji) — Open-Source Verifiable Credentialing Stack
+
+I actively contribute to **Inji**, an open-source Digital Public Infrastructure (DPI) project by [MOSIP](https://mosip.io) that enables governments and institutions to issue, hold, and verify **digital credentials** in a secure, privacy-preserving, and interoperable way.
+
+Inji powers real-world use cases like national identity, education certificates, farmer registries, and health credentials — all built on open standards (OpenID4VCI, OpenID4VP, W3C VCs, SD-JWT).
+
+**My contributions span across:**
+
+- 📱 **Inji Wallet (Mobile)** — React Native cross-platform wallet for storing & sharing Verifiable Credentials
+- 🍎 **iOS native modules** — Swift-based native frameworks (Tuvali BLE, OCR, background processing) integrated into the wallet
+- 🔐 **Credential formats** — Working with LDP-VC, SD-JWT, and MSO-MDOC credential standards
+- 🧰 **Inji Libraries & SDKs** — Contributing to reusable modules for OpenID4VCI/VP, cryptographic operations, and key management
+
+[![Inji Wallet](https://img.shields.io/badge/Inji_Wallet-contributor-brightgreen?style=flat-square&logo=github)](https://github.com/inji/inji-wallet)
+[![MOSIP](https://img.shields.io/badge/MOSIP-open_source-blue?style=flat-square)](https://mosip.io)
+
+---
+
 ## 📈 GitHub Stats
 
 <div align="center">
