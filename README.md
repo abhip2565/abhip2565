@@ -2,7 +2,7 @@
 
 # Hi, I'm Abhishek Paul 👋
 
-### 💡 Software Engineer · 📊 Data Enthusiast · 📱 iOS & Mobile Developer
+### 💡 Software Engineer · 📊 Data Enthusiast · 📱 Mobile Developer
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/abhishek-paul-93a8a2191)
 [![Email](https://img.shields.io/badge/Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:paul.apaul.abhishek.ap@gmail.com)
@@ -16,7 +16,7 @@
 
 ## 🚀 About Me
 
-I'm a **Software Engineer** based in **Kolkata, India** 🇮🇳, passionate about building intelligent systems and delightful user experiences. I graduated in **Computer Science & Engineering (2023)** and have since been working across the full stack — from iOS native apps in Swift, to multi-agent AI systems, to data analytics.
+I'm a **Software Engineer** based in **Kolkata, India** 🇮🇳, passionate about building intelligent systems and delightful user experiences. I graduated in **Computer Science & Engineering (2023)** and have since been working across the full stack — from **React native apps**,iOS native apps in Swift, to multi-agent AI systems, to data analytics.
 
 - 🔭 Currently building: **BGCategorizationProcessor** — an offline-first Swift package for background text categorization with CoreML & SQLite
 - 🌱 Exploring: **Multi-Agent AI Systems**, **Vision-Language Models**, and **React Native**
