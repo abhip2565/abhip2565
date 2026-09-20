@@ -213,11 +213,19 @@ def spine_strip(slide, y=6.42, highlight=()):
 
 # ---------------------------------------------------------------- section divider
 def section(title, minutes, blurb, covers, highlight=(), num=None):
-    s = new_slide(dark=True)
+    s = new_slide(dark=True, chrome=False)
     STATE['section'] = title
     STATE['toc'].append((title, minutes, STATE['n']))
-    rect(s, 0, 0, W, H, fill=C['dark'])
-    rect(s, 0, 0, 0.18, H, fill=C['accent'])
+    if not THEME.get('bg_image'):
+        rect(s, 0, 0, W, H, fill=C['dark'])
+        rect(s, 0, 0, 0.18, H, fill=C['accent'])
+    else:
+        if THEME.get('mark'):
+            s.shapes.add_picture(THEME['mark'], Inches(7.40), Inches(4.16),
+                                 Inches(6.13), Inches(3.10))
+        if THEME.get('logo'):
+            s.shapes.add_picture(THEME['logo'], Inches(12.00), Inches(0.30),
+                                 Inches(0.89), Inches(0.45))
     _, tf = tb(s, 1.0, 1.95, 7.2, 0.4)
     para(tf, ("SECTION %s" % num) if num else "SECTION", size=11,
          color=C['accent'], bold=True, first=True)
@@ -227,7 +235,7 @@ def section(title, minutes, blurb, covers, highlight=(), num=None):
     para(tf, blurb, size=12.5, color=RGBColor(0x9E, 0xB8, 0xCE), first=True,
          line_spacing=1.3)
     # timing badge
-    b = rect(s, 9.4, 2.30, 2.9, 1.0, fill=C['dark2'], line=C['accent'], lw=1.2,
+    b = rect(s, 9.4, 2.30, 2.9, 1.0, fill=None, line=C['accent'], lw=1.4,
              shape=MSO_SHAPE.ROUNDED_RECTANGLE, adj=0.10)
     _, tf = tb(s, 9.5, 2.48, 2.7, 0.45)
     para(tf, minutes, size=22, color=C['white'], bold=True, align=PP_ALIGN.CENTER,
@@ -264,6 +272,12 @@ def section(title, minutes, blurb, covers, highlight=(), num=None):
 def slide(title, kicker=None, sub=None, hl=None):
     s = new_slide()
     y = head(s, title, kicker, sub)
+    if THEME.get('canvas'):
+        top = THEME.get('canvas_top') or (y - 0.22)
+        _cv = rect(s, ML - 0.26, top, CW + 0.52, 6.94 - top,
+                   fill=THEME.get('canvas_fill') or C['bg'],
+                   shape=MSO_SHAPE.ROUNDED_RECTANGLE, adj=0.02)
+        _cv.name = 'BODYCANVAS'
     if hl:
         spine_strip(s, 6.42, hl)
     return s, y
@@ -366,7 +380,7 @@ def sequence(slide_, actors, steps, top=1.40, height=5.30, numbered=True,
             lx = max(L, min(mid - boxw / 2, R - boxw))
             la = PP_ALIGN.CENTER
         # opaque mask, only as wide as the text, so lifelines stay visible either side
-        rect(slide_, lx, yy + 0.005, boxw, lab_h, fill=C['white'])
+        rect(slide_, lx, yy + 0.005, boxw, lab_h, fill=C['bg'])
         _, tf = tb(slide_, lx + 0.05, yy + 0.02, boxw - 0.10, lab_h,
                    wrap=False, anchor=MSO_ANCHOR.MIDDLE)
         ch = []
@@ -394,6 +408,11 @@ def demo_slide(num, title, minutes, setup, show, behind, fail=None):
          color=C['accent_l'], bold=True, first=True)
     _, tf = tb(s, ML, 0.45, 9.6, 0.42)
     para(tf, title, size=20, color=C['white'], bold=True, first=True)
+    if THEME.get('canvas'):
+        _cv = rect(s, ML - 0.26, 1.06, CW + 0.52, 5.88,
+                   fill=THEME.get('canvas_fill') or C['bg'],
+                   shape=MSO_SHAPE.ROUNDED_RECTANGLE, adj=0.02)
+        _cv.name = 'BODYCANVAS'
     y = 1.24
     ch = 4.18
     card(s, ML, y, 3.88, ch, "Before you start", setup, accent=C['primary'],

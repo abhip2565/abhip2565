@@ -34,6 +34,7 @@ C = dict(
     dark=RGBColor(0x0B, 0x1F, 0x33),
     dark2=RGBColor(0x14, 0x2E, 0x49),
     code_bg=RGBColor(0x0E, 0x1C, 0x2D),
+    bg=RGBColor(0xFF, 0xFF, 0xFF),
 )
 F_SANS = "Arial"
 F_MONO = "Consolas"
@@ -43,6 +44,14 @@ ML, MR = 0.55, 0.55
 CW = W - ML - MR          # content width 12.233
 BODY_TOP = 1.34
 BODY_BOT = 6.88
+
+THEME = dict(
+    bg_image=None, logo=None, rail=None, mark=None,
+    canvas=False, canvas_fill=None, canvas_top=None,
+    title_color=None, sub_color=None, kicker_color=None, footer_color=None,
+    sub_code_color=None, sub_strong_color=None,
+    title_italic=False, rule=True,
+)
 
 prs = Presentation()
 prs.slide_width = Inches(W)
@@ -113,7 +122,7 @@ def tb(slide, x, y, w, h, wrap=True, anchor=MSO_ANCHOR.TOP):
     tf.vertical_anchor = anchor
     return t, tf
 
-def para(tf, text, size=12, color=None, bold=False, italic=False, font=F_SANS,
+def para(tf, text, size=12, color=None, bold=False, italic=False, font=None,
          align=PP_ALIGN.LEFT, space_before=0, space_after=0, first=False,
          line_spacing=1.14):
     p = tf.paragraphs[0] if first else tf.add_paragraph()
@@ -128,8 +137,9 @@ def para(tf, text, size=12, color=None, bold=False, italic=False, font=F_SANS,
     return p
 
 def rich(tf, chunks, size=12, align=PP_ALIGN.LEFT, first=False, space_before=0,
-         space_after=0, font=F_SANS, line_spacing=1.14):
+         space_after=0, font=None, line_spacing=1.14):
     """chunks = [(text, color, bold, italic?, font?), ...]"""
+    font = font or F_SANS
     p = tf.paragraphs[0] if first else tf.add_paragraph()
     p.alignment = align
     p.space_before = Pt(space_before); p.space_after = Pt(space_after)
@@ -169,11 +179,20 @@ def chip(slide, x, y, w, h, text, fill, fg, size=9.5, bold=True, border=None):
     return s
 
 # ---------------------------------------------------------------- chrome
-def new_slide(dark=False):
+def new_slide(dark=False, chrome=True):
     s = prs.slides.add_slide(BLANK)
     bg = s.background.fill
     bg.solid()
-    bg.fore_color.rgb = C['dark'] if dark else C['white']
+    bg.fore_color.rgb = C['dark'] if dark else C['bg']
+    if THEME.get('bg_image'):
+        s.shapes.add_picture(THEME['bg_image'], 0, 0, Inches(W), Inches(H))
+        if chrome and THEME.get('rail'):
+            r = s.shapes.add_picture(THEME['rail'], Inches(-3.02), Inches(3.68),
+                                     Inches(6.40), Inches(0.09))
+            r.rotation = 90
+        if chrome and THEME.get('logo'):
+            s.shapes.add_picture(THEME['logo'], Inches(12.00), Inches(0.30),
+                                 Inches(0.89), Inches(0.45))
     STATE['n'] += 1
     return s
 
@@ -203,7 +222,8 @@ def notes(slide, explain, caveats=None, questions=None, minutes=None):
         rr.font.bold = True; rr.font.size = Pt(11)
 
 def footer(slide, dark=False):
-    fg = C['faint'] if not dark else RGBColor(0x64, 0x80, 0x9B)
+    fg = THEME.get('footer_color') or (C['faint'] if not dark
+                                       else RGBColor(0x64, 0x80, 0x9B))
     _, tf = tb(slide, ML, 7.02, 9.0, 0.3)
     para(tf, STATE['section'], size=8.5, color=fg, first=True)
     _, tf2 = tb(slide, W - MR - 1.2, 7.02, 1.2, 0.3)
@@ -213,10 +233,12 @@ def head(slide, title, kicker=None, sub=None, rule=True):
     y = 0.42
     if kicker:
         _, tf = tb(slide, ML, y - 0.07, CW, 0.26)
-        para(tf, kicker.upper(), size=9, color=C['accent'], bold=True, first=True)
+        para(tf, kicker.upper(), size=9,
+             color=THEME.get('kicker_color') or C['accent'], bold=True, first=True)
         y += 0.28
     _, tf = tb(slide, ML, y, CW, 0.52)
-    para(tf, title, size=25, color=C['ink'], bold=True, first=True, line_spacing=1.0)
+    para(tf, title, size=25, color=THEME.get('title_color') or C['ink'],
+         bold=True, italic=bool(THEME.get('title_italic')), first=True, line_spacing=1.0)
     y2 = y + (0.50 if not sub else 0.48)
     if sub:
         _, tf = tb(slide, ML, y2, CW, 0.34)
@@ -225,14 +247,15 @@ def head(slide, title, kicker=None, sub=None, rule=True):
             if not pt:
                 continue
             if pt.startswith('`'):
-                ch.append((pt[1:-1], C['primary'], False, False, F_MONO))
+                ch.append((pt[1:-1], THEME.get('sub_code_color') or C['primary'],
+                           False, False, F_MONO))
             elif pt.startswith('**'):
-                ch.append((pt[2:-2], C['ink'], True))
+                ch.append((pt[2:-2], THEME.get('sub_strong_color') or C['ink'], True))
             else:
-                ch.append((pt, C['muted'], False))
+                ch.append((pt, THEME.get('sub_color') or C['muted'], False))
         rich(tf, ch, size=11.5, first=True)
         y2 += 0.34
-    if rule:
+    if rule and THEME.get('rule', True):
         line(slide, ML, y2 + 0.10, W - MR, y2 + 0.10, C['line'], 1.0)
     return y2 + 0.32
 
@@ -361,7 +384,7 @@ def table(slide, x, y, w, headers, rows, col_w=None, fsize=9.5, hsize=9.5,
         for j, val in enumerate(row):
             c = t.cell(i + 1, j)
             c.fill.solid()
-            c.fill.fore_color.rgb = C['white'] if (not zebra or i % 2 == 0) else C['surf']
+            c.fill.fore_color.rgb = C['bg'] if (not zebra or i % 2 == 0) else C['surf']
             c.margin_left = Inches(0.07); c.margin_right = Inches(0.06)
             c.margin_top = Inches(0.02); c.margin_bottom = Inches(0.02)
             c.vertical_anchor = MSO_ANCHOR.MIDDLE
@@ -409,6 +432,8 @@ def fit_slide(sl, top0=1.28, limit=6.86, footer_top=7.0):
             continue
         if t is None or h is None:
             continue
+        if sh.name == 'BODYCANVAS':
+            continue                      # stretched to the body after fitting
         ti, hi, wi = t / EMU, h / EMU, w / EMU
         if hi > 6.9 or (wi > 13.0 and hi > 7.0):
             continue                      # backgrounds / full-height rails
@@ -444,9 +469,16 @@ def fit_slide(sl, top0=1.28, limit=6.86, footer_top=7.0):
                                 r.font.size = Pt(max(6.8, round(r.font.size.pt * (0.55 + 0.45 * k), 1)))
     return k
 
-def fit_all():
+def _stretch_canvas(sl, bottom=6.94):
+    for sh in sl.shapes:
+        if sh.name == 'BODYCANVAS':
+            sh.height = Emu(int((bottom - sh.top / 914400) * 914400))
+
+
+def fit_all(canvas_bottom=6.94):
     n = 0
     for sl in prs.slides:
         if fit_slide(sl):
             n += 1
+        _stretch_canvas(sl, canvas_bottom)
     return n

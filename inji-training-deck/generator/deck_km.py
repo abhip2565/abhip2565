@@ -40,7 +40,7 @@ def arrow(slide, x1, y1, x2, y2, color=None, lw=1.4, dash=None, label=None,
             bx, by = mx - lw_box / 2, my - 0.13
         else:
             bx, by = mx + 0.10, my - 0.13
-        rect(slide, bx, by, lw_box, 0.24, fill=C['white'])
+        rect(slide, bx, by, lw_box, 0.24, fill=C['bg'])
         _, tf = tb(slide, bx, by, lw_box, 0.24, wrap=False, anchor=MSO_ANCHOR.MIDDLE)
         para(tf, label, size=lsize, color=lcolor or C['muted'], bold=True,
              align=PP_ALIGN.CENTER, first=True)

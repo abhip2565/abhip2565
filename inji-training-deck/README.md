@@ -6,16 +6,25 @@ generator that produces them.
 | Deck | Slides | For |
 |---|---|---|
 | `Inji-Wallet-and-Inji-Web-Technical-Enablement-Brazil.pptx` | 85 | A 4–5 hour end-to-end technical enablement session for a Brazil implementation team |
-| `Inji-Key-Manager-Deep-Dive-Dataprev-Day1.pptx` | 24 | The 90-minute Key Manager block (Day 1, 11:35–13:05) of the Dataprev Inji deep-dive |
+| `Inji-Key-Manager-Deep-Dive.pptx` | 24 | A standalone 90-minute Key Manager deep dive. Programme-neutral, styled with the official Inji deck template |
 
 Both are 16:9 with full speaker notes on every slide (what to explain, caveats, likely
 audience questions, recommended time).
 
 ---
 
-## Deck 2 — Key Manager deep dive (Dataprev, Day 1)
+## Deck 2 — Key Manager deep dive
 
-**File:** `Inji-Key-Manager-Deep-Dive-Dataprev-Day1.pptx` · 24 slides · 90 minutes · ~5,500 words of notes
+**File:** `Inji-Key-Manager-Deep-Dive.pptx` · 24 slides · 90 minutes · ~5,500 words of notes
+
+Styled with the **official Inji deck template** (June 2026): the brand gradient background,
+the Inji logo and watermark, the left accent rail, Montserrat, and `#F27D21` orange. Dense
+technical content sits on a light panel over the gradient, which is how the template treats
+its own content boxes.
+
+Slide text is programme-neutral and declarative — no country, organisation or schedule
+references, and no imperative instructions to the audience. Speaker notes keep their
+coaching tone, since they are written for whoever is presenting.
 
 Diagram-led, covering the eight topics in the session plan:
 
@@ -114,15 +123,20 @@ cd generator
 # Brazil enablement deck
 python3 -c "exec(open('build.py').read()); from deck_core import prs; prs.save('../deck1.pptx')"
 
-# Key Manager deep dive
+# Key Manager deep dive (applies the Inji brand theme)
 python3 -c "exec(open('build_km.py').read()); from deck_core import prs; prs.save('../deck2.pptx')"
 ```
+
+`deck_core.THEME` drives the branding. It is empty by default, so deck 1 renders on white;
+`theme_inji.apply()` fills it in and deck 2 renders on the Inji gradient. Nothing else in
+the slide content changes between the two.
 
 | File | Role |
 |---|---|
 | `deck_core.py` | Design system: colours, type, tables, code boxes with syntax highlighting, auto-fit pass |
 | `deck_blocks.py` | Composite blocks: bullets, cards, callouts, the recurring architecture spine, sequence diagrams, demo checkpoints |
 | `deck_km.py` | Extra primitives for the Key Manager deck: nodes, labelled arrows, trust zones, lifecycle strips, rotation timelines |
+| `theme_inji.py` | The Inji brand theme — palette, fonts and the `assets/` background, logo, rail and watermark. Applied by deck 2 only; deck 1 keeps the neutral light theme |
 | `build.py` | Slide content for deck 1 |
 | `build_km.py` | Slide content for deck 2 |
 | `check.py` | Reports any slide whose content overflows the canvas |

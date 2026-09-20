@@ -1,30 +1,35 @@
 # -*- coding: utf-8 -*-
-"""Dataprev Inji Deep-Dive — Day 1, Key Manager: trust & key management (90 min).
+"""Inji Key Manager deep dive — trust & key management (90 min).
 Facts verified against mosip/keymanager and mosip/inji-certify."""
 from deck_km import *   # noqa
+import theme_inji
+theme_inji.apply()
+F_SANS = theme_inji.SANS   # this module's own binding from the star-import
 
 # =================================================================== 1 TITLE
-s = new_slide(dark=True)
+s = new_slide(dark=True, chrome=False)
 STATE['section'] = "Key Manager — trust & key management"
-rect(s, 0, 0, W, H, fill=C['dark'])
-rect(s, 0, 0, W, 0.10, fill=C['accent'])
-rect(s, 8.55, 0.10, 4.78, H - 0.10, fill=C['dark2'])
-rect(s, 8.55, 0.10, 0.045, H - 0.10, fill=RGBColor(0x1E, 0x3F, 0x5C))
-_, tf = tb(s, 0.95, 1.30, 7.3, 0.4)
-para(tf, "DATAPREV INJI DEEP-DIVE  ·  DAY 1  ·  11:35–13:05", size=11.5,
+s.shapes.add_picture(theme_inji.ASSETS + '/inji_mark.png', Inches(7.40), Inches(4.16),
+                     Inches(6.13), Inches(3.10))
+s.shapes.add_picture(theme_inji.ASSETS + '/inji_logo.png', Inches(0.95), Inches(0.62),
+                     Inches(1.28), Inches(0.65))
+_, tf = tb(s, 0.95, 1.62, 7.3, 0.4)
+para(tf, "INJI DEEP-DIVE  ·  KEY MANAGER", size=11.5,
      color=C['accent'], bold=True, first=True)
-_, tf = tb(s, 0.95, 1.82, 7.4, 2.0)
-para(tf, "Key Manager", size=46, color=C['white'], bold=True, first=True, line_spacing=1.0)
+_, tf = tb(s, 0.95, 2.10, 7.4, 2.0)
+para(tf, "Key Manager", size=46, color=C['white'], bold=True, italic=True,
+     first=True, line_spacing=1.0)
 para(tf, "Trust and key management,\nfrom the core idea to production detail", size=18,
-     color=RGBColor(0x8F, 0xAE, 0xC8), space_before=8, line_spacing=1.2)
-line(s, 0.95, 4.45, 5.2, 4.45, C['accent'], 2.5)
-_, tf = tb(s, 0.95, 4.70, 7.3, 1.5)
+     color=theme_inji.ON_DARK, space_before=8, line_spacing=1.2)
+line(s, 0.95, 4.72, 4.30, 4.72, C['accent'], 2.5)
+_, tf = tb(s, 0.95, 4.96, 7.3, 1.5)
 para(tf, "90 minutes  ·  8 topics  ·  17 architecture and flow diagrams", size=13,
-     color=RGBColor(0xC6, 0xD6, 0xE4), first=True)
-para(tf, "Every claim on these slides was checked against mosip/keymanager and mosip/inji-certify. Version-specific behaviour is flagged where it matters.",
-     size=10.5, color=RGBColor(0x62, 0x80, 0x9B), space_before=8, line_spacing=1.3)
-_, tf = tb(s, 8.98, 1.20, 4.1, 0.3)
-para(tf, "THE EIGHT QUESTIONS WE ANSWER", size=8.5, color=C['accent'], bold=True, first=True)
+     color=theme_inji.ON_DARK, first=True)
+para(tf, "Verified against mosip/keymanager and mosip/inji-certify. Version-specific behaviour is flagged where it matters.",
+     size=10.5, color=theme_inji.ON_DARK_DIM, space_before=8, line_spacing=1.3)
+_, tf = tb(s, 8.62, 1.20, 4.3, 0.3)
+para(tf, "THE EIGHT QUESTIONS THIS SESSION ANSWERS", size=8.5, color=C['accent'],
+     bold=True, first=True)
 qs = ["Why a dedicated Key Manager at all?",
       "What is the key hierarchy, really?",
       "How does Certify sign without holding a key?",
@@ -32,22 +37,22 @@ qs = ["Why a dedicated Key Manager at all?",
       "Software keystore or HSM — and why?",
       "How does a key become a trust anchor?",
       "How do status lists and keys interact?",
-      "What do we do if a key is compromised?"]
-cy = 1.60
+      "What happens if a key is compromised?"]
+cy = 1.62
 for i, q in enumerate(qs):
-    b = rect(s, 8.98, cy + 0.02, 0.28, 0.28, fill=C['accent'], shape=MSO_SHAPE.OVAL)
+    b = rect(s, 8.62, cy + 0.02, 0.28, 0.28, fill=C['accent'], shape=MSO_SHAPE.OVAL)
     tfb = b.text_frame; tfb.vertical_anchor = MSO_ANCHOR.MIDDLE
     pb = tfb.paragraphs[0]; pb.alignment = PP_ALIGN.CENTER
     rb = pb.add_run(); rb.text = str(i + 1); rb.font.size = Pt(8.5); rb.font.bold = True
-    rb.font.color.rgb = C['dark']; rb.font.name = F_SANS
-    _, t3 = tb(s, 9.36, cy, 3.6, 0.6)
-    para(t3, q, size=10, color=RGBColor(0xC6, 0xD6, 0xE4), first=True, line_spacing=1.2)
+    rb.font.color.rgb = C['white']; rb.font.name = F_SANS
+    _, t3 = tb(s, 9.00, cy, 3.9, 0.6)
+    para(t3, q, size=10, color=theme_inji.ON_DARK, first=True, line_spacing=1.2)
     cy += 0.62
 notes(s, ["Open by naming the stakes: everything the issuance side does — every credential, every DID document, every status list — is only worth something because a private key stayed private. This session is about the component that makes that true.",
-          "Tell the room the shape of the 90 minutes: 8 topics, roughly 10 minutes each, diagram-led. Questions welcome throughout; anything that needs the hands-on environment gets parked for the 15:10 lab.",
+          "Tell the room the shape of the 90 minutes: 8 topics, roughly 10 minutes each, diagram-led. Questions welcome throughout; anything needing the hands-on environment gets parked for the lab.",
           "Ask up front: who here has run an HSM in production? Who has done a key rotation on a live service? The answers tell you how deep to go in topics 4 and 5."],
       caveats=["This is the MOSIP Key Manager (mosip/keymanager, kernel-keymanager-service). Inji Certify embeds the same library rather than calling it over HTTP — that distinction comes up in topic 2 and matters for deployment.",
-               "Numbers on these slides (validity days, pre-expire days) come from the shipped key_policy_def seed data. Dataprev will set its own."],
+               "Numbers on these slides (validity days, pre-expire days) come from the shipped key_policy_def seed data. Every deployment sets its own."],
       minutes="2 min")
 footer(s, dark=True)
 
@@ -61,7 +66,7 @@ rows = [
  ["4", "**HSM integration**", "12 min", "PKCS#11, PKCS12, Offline, JCE; SoftHSM vs a real HSM; production trade-offs", "2 diagrams"],
  ["5", "**Trust anchors**", "12 min", "How a public key becomes something a verifier trusts; `did.json`, `jwks.json`, safe rotation", "2 diagrams"],
  ["6", "**Status list mechanics**", "10 min", "Revocation and suspension, and how status lists interact with key rotation", "2 diagrams"],
- ["7", "**Multi-issuer and multi-tenant trust**", "6 min", "Key isolation on one Key Manager; being trusted outside Dataprev", "1 diagram"],
+ ["7", "**Multi-issuer and multi-tenant trust**", "6 min", "Key isolation on one Key Manager; being trusted outside your own deployment", "1 diagram"],
  ["8", "**Incident: key compromise**", "5 min", "What to do in the first hour, and how fast trust can actually be withdrawn", "1 diagram"],
 ]
 _tb = table(s, ML, y, CW, ["#", "Topic", "Time", "What it covers", "Visuals"], rows,
@@ -171,7 +176,7 @@ callout(s, ML + 6.28, yy, 5.95, "Because Certify **embeds** the key manager, `mo
 notes(s, ["This slide prevents a real deployment misunderstanding. In a full MOSIP platform the Key Manager is a shared REST service. In the Inji stack, Certify links the same library in-process and owns its own keystore and key tables.",
           "The evidence is in certify-default.properties: mosip.kernel.keymanager.hsm.keystore-type, config-path and keystore-pass are set on Certify itself. Show that file in the hands-on if people doubt it.",
           "Consequences to state explicitly: no network hop for signing (good for latency), no shared custody across services (good for isolation), but also no single audit point across Certify and eSignet — each has its own.",
-          "For Dataprev: which shape you want is a real architecture decision. If several Dataprev services will sign credentials, Shape A gives you one custody point; Shape B gives you simpler operations per service."],
+          "Which shape you want is a real architecture decision. If several services in your estate will sign credentials, Shape A gives you one custody point; Shape B gives you simpler operations per service."],
       caveats=["Shape B means every Certify replica needs access to the keystore. With PKCS11 that means every pod needs the HSM client library and credentials — this is a real operational constraint we return to in topic 4.",
                "Do not assume the local PKCS12 file in the default config is acceptable anywhere but a laptop."],
       questions=["Can we run Certify against a separate Key Manager service? — Not out of the box in the current code path; it links the library. Treat it as a change to propose upstream, not a config flag."],
@@ -258,7 +263,7 @@ sequence(s, ["Caller (Certify)", "Key Manager", "Key generator", "HSM", "Postgre
   (1, 0, "certificate + key id — never the private key", 'resp'),
  ], top=1.42, height=4.30)
 yy = 6.00
-callout(s, ML, yy, CW, "Read step 8 and step 11 together. The row in `key_store` holds a private key that **only the HSM can unwrap**. An attacker with a full database dump, and no HSM access, has a pile of ciphertext.", kind='good', size=10.6)
+callout(s, ML, yy, CW, "Steps 8 and 11 together are the whole point. The row in `key_store` holds a private key that **only the HSM can unwrap**. An attacker with a full database dump, and no HSM access, has a pile of ciphertext.", kind='good', size=10.6)
 notes(s, ["Walk this slowly; it is the mechanism behind the previous slide's claim.",
           "Step 4: the key pair is generated in software by the BouncyCastle key generator — getAsymmetricKey(), or getEd25519KeyPair() for the Ed25519 signing reference.",
           "Step 8: keymanagerUtil.encryptKey(privateKey, masterPublicKey). The private key is wrapped with the MODULE PUBLIC key, so wrapping needs no HSM secret — only unwrapping does.",
@@ -301,7 +306,7 @@ bullets(s, ML + 6.46, yy - 0.10, 5.77, [
  "If no current key exists for that alias, one is generated on the spot — first signature of the day can be slower.",
 ], size=10.0)
 notes(s, ["This is the answer to 'how does Certify sign without touching key material'. It calls a signing API with an identifier, and gets a signature back.",
-          "Show the key-alias-mapper property on screen. It is the seam between 'which algorithm does this credential type use' and 'which key in the Key Manager'. Dataprev will edit exactly this line when choosing an algorithm.",
+          "Show the key-alias-mapper property on screen. It is the seam between 'which algorithm does this credential type use' and 'which key in the Key Manager'. This is the line that changes when a deployment chooses an algorithm.",
           "Step 6 and 7 are the nuance from the previous slide: the base private key is unwrapped into process memory to sign. For the Ed25519 and EC signing reference ids the code path goes to the HSM directly instead — worth verifying for whichever algorithm you pick.",
           "Point at the last bullet as an operational gotcha: lazy generation means the very first credential after a rotation boundary pays the cost of generating a key pair and writing two rows."],
       caveats=["kid continuity is critical. If you change the algorithm for a credential type, you change the key, so you change the kid — and every already-issued credential still references the old one. That is fine, because old certificates stay published, but only if you do not prune them.",
@@ -353,8 +358,8 @@ notes(s, ["Put the three code boxes on screen and let people read. Then make thr
           "One: key_alias is append-only in practice. Nothing removes rows. That is how history is preserved.",
           "Two: key_store.master_key is a foreign-key-ish pointer to the key_alias id of the module key that wrapped this private key. That is the link that makes unwrapping possible and the link that makes a database dump useless on its own.",
           "Three: uni_ident carries a unique constraint on appId_refId_timestamp. If you ever see a 'no unique alias' error in the logs, this is the constraint the code is defending — it means two current keys were found for one app_id/ref_id, which should be impossible.",
-          "The policy table is where Dataprev will make a real decision: how long should a VC signing key live, and how much overlap do you want? Those two numbers drive everything in topic 3."],
-      caveats=["The seed numbers are MOSIP defaults, not recommendations for Brazil. A two-year signing key with a 30-day overlap is a policy choice you should make deliberately.",
+          "The policy table is where a real decision gets made: how long should a VC signing key live, and how much overlap do you want? Those two numbers drive everything in topic 3."],
+      caveats=["The seed numbers are MOSIP defaults, not recommendations for any particular deployment. A two-year signing key with a 30-day overlap is a policy choice you should make deliberately.",
                "cert_thumbprint is how a credential is traced back to the key that signed it. Keep it in your logs; it is far more useful than a key id in an incident.",
                "There are more tables — ca_cert_store, partner_cert_store, data_encrypt_keystore — but these three carry the signing story."],
       minutes="6 min")
@@ -383,7 +388,7 @@ table(s, ML, y, CW, ["Group", "Endpoint", "What it does", "When you reach for it
 notes(s, ["Reference slide — do not read it out. Point at three rows.",
           "getAllCertificates versus getCertificate is the single most important distinction on this slide. getCertificate gives you today's key. getAllCertificates gives you every key that alias has ever had. Certify's jwks.json is built from getAllCertificates, and that is exactly why rotation does not break old credentials.",
           "revokeKey does something much less dramatic than the name suggests — we cover it in topic 3. Flag it now so nobody leaves thinking it destroys anything.",
-          "generateCSR plus uploadCertificate is the path for Dataprev if the trust chain must come from an external or national CA rather than the self-signed ROOT. That is a likely requirement for a government issuer and worth flagging to whoever owns PKI."],
+          "generateCSR plus uploadCertificate is the path if the trust chain must come from an external or national CA rather than the self-signed ROOT. That is a likely requirement for a government issuer and worth flagging to whoever owns PKI."],
       caveats=["All of these are protected by role-based authorisation (mosip.role.keymanager.*). In the embedded-in-Certify shape, most are not exposed at all — Certify calls the library directly.",
                "Do not expose the Key Manager API to anything but trusted internal callers. There is no scenario where a wallet or a verifier should reach it."],
       minutes="4 min")
@@ -405,9 +410,9 @@ rows = [
  ["**CURRENT**", "`now` is before `key_expire_dtimes − pre_expire_days`", "Returned by `getCertificate`; used for every new signature", "Exactly one per app_id + ref_id"],
  ["**SUPERSEDED**", "`now` has passed the pre-expire boundary", "No longer used for new signatures. A new key is generated on the next request", "**Still verifies** — this is the overlap window"],
  ["**EXPIRED**", "`now` is past `key_expire_dtimes`", "Verifiers should reject signatures dated after this", "Certificate `notAfter` carries the same date"],
- ["**RETAINED**", "Always", "Still returned by `getAllCertificates`; still published in `jwks.json`", "Never delete these rows"],
+ ["**RETAINED**", "Always", "Still returned by `getAllCertificates`; still published in `jwks.json`", "These rows are never deleted"],
 ]
-table(s, ML, yy, CW, ["State", "Entered when", "What it means operationally", "Watch out for"], rows,
+table(s, ML, yy, CW, ["State", "Entered when", "What it means operationally", "The catch"], rows,
       col_w=[1.6, 3.5, 4.5, 3.2], fsize=9.0, row_h=0.50, head_h=0.32)
 notes(s, ["The state that surprises people is SUPERSEDED. A key stops being used for new signatures before it expires, and the gap between those two moments is the whole point.",
           "The mechanism is one line in KeymanagerUtil.isValidTimestamp: a key counts as current only while now is before keyExpiryTime minus preExpireDays. Once that boundary passes, the key is filtered out of the 'current' list, and the next signing request generates a fresh one.",
@@ -447,14 +452,14 @@ yy2 = yy + 1.30
 rows = [
  ["Short validity, short overlap", "Small blast radius", "More rotations; a publication failure is felt quickly", "High-value, short-lived credentials"],
  ["Long validity, long overlap", "Fewer moving parts", "A compromised key is in play for longer", "Long-lived credentials, stable infrastructure"],
- ["Long validity, short overlap", "!!Worst of both", "Rare rotations, and little slack when one goes wrong", "Avoid"],
+ ["Long validity, short overlap", "!!Worst of both", "Rare rotations, and little slack when one goes wrong", "!!Not recommended"],
 ]
 table(s, ML, yy2, CW, ["Policy shape", "Gains you", "Costs you", "Fits"], rows,
       col_w=[2.8, 2.6, 4.4, 2.4], fsize=9.2, row_h=0.42, head_h=0.32)
 notes(s, ["This slide is the heart of topic 3. Let the timeline sit on screen while you talk.",
           "The arithmetic with shipped defaults: 730 days validity, 30 days pre-expire, so a key is used for new signatures for 700 days and then remains valid for verification for 30 more.",
-          "Now pose the question that matters: if a credential Dataprev issues is valid for five years, and the signing key rotates every two, how does a verifier check a four-year-old credential? The answer is that the old certificate is still published in jwks.json and the DID document, because getAllCertificates returns every certificate the alias has ever had. Publication lifetime is driven by credential lifetime, not key lifetime.",
-          "Then the policy table. Ask the room which row Dataprev is in today and which row it should be in.",
+          "Now pose the question that matters: if an issued credential is valid for five years, and the signing key rotates every two, how does a verifier check a four-year-old credential? The answer is that the old certificate is still published in jwks.json and the DID document, because getAllCertificates returns every certificate the alias has ever had. Publication lifetime is driven by credential lifetime, not key lifetime.",
+          "Then the policy table. Ask the room which row their deployment is in today and which row it should be in.",
           "If anyone asks about automated rotation: there is no scheduler. Rotation happens because the next signing request finds no current key. That is simple and robust, but it also means rotation is invisible until it happens — so monitor key_alias for new rows."],
       caveats=["Overlap does not protect you from a publication failure. If jwks.json or the DID document is stale or unreachable at the moment a verifier checks, the overlap window is irrelevant. Monitor those endpoints as production dependencies.",
                "Changing key_validity_duration affects only keys generated after the change. Existing keys keep the expiry they were born with."],
@@ -471,7 +476,7 @@ ev = [
   ["The old certificate stays in `key_alias` and stays published.", "`kid` in the old credential still resolves.", "No re-issuance, no action for holders."],
   C['green'], "++NO IMPACT"),
  ("Key expired\n(past notAfter)", "Verification of anything signed by it should now fail.",
-  ["A correct verifier checks the certificate's validity window.", "Credentials outliving their signing certificate become unverifiable.", "**Plan publication lifetime around credential lifetime.**"],
+  ["A correct verifier checks the certificate's validity window.", "Credentials outliving their signing certificate become unverifiable.", "**Publication lifetime has to be planned around credential lifetime.**"],
   C['amber'], "~~PLAN FOR IT"),
  ("Key revoked\n(`PUT /revokeKey`)", "In MOSIP this *expires* the key — it does not destroy anything.",
   ["`key_expire_dtimes` is set to one minute ago.", "A new key is generated on the next request.", "**Already-issued credentials are NOT invalidated.**"],
@@ -509,12 +514,12 @@ for i, (t, headline, pts, col, badge) in enumerate(ev):
         rich(t4, ch, size=9.2, first=True, line_spacing=1.24)
         cy += 0.16 + max(1, -(-len(re.sub(r'[`*]', '', p_)) // 30)) * 0.152
 yy = y + 4.20
-callout(s, ML, yy, CW, "Say this out loud in every design review: **revoking a key is not revoking a credential.** `revokeKey` rotates your signing key early. To stop a specific credential being accepted you flip its bit in the status list. Two mechanisms, two blast radii — and only one of them helps when a single citizen's credential must be withdrawn.", kind='bad', size=10.8)
+callout(s, ML, yy, CW, "The distinction that matters in every design review: **revoking a key is not revoking a credential.** `revokeKey` rotates your signing key early. To stop a specific credential being accepted you flip its bit in the status list. Two mechanisms, two blast radii — and only one of them helps when a single citizen's credential must be withdrawn.", kind='bad', size=10.8)
 notes(s, ["This is the slide to slow down on. The revokeKey behaviour genuinely surprises experienced people.",
           "Read the implementation with them if there is any doubt: revokeKey computes expireTime as now minus one minute and calls storeKeyInAlias with it. That is the entire effect. No row is deleted, no certificate is withdrawn, no credential is touched.",
           "So the practical rule: revokeKey is an emergency rotation, useful when you believe a key is compromised and you want to stop signing NEW things with it. It does nothing about what was already signed.",
           "To withdraw something already issued you need the status list — topic 6 — or, if the key itself is compromised and you must repudiate everything it signed, you have to stop publishing its certificate, which invalidates every credential it ever signed. That is the nuclear option in topic 8.",
-          "Ask the room: for a Dataprev credential, which of these four events is most likely in the first year of operation? Usually the answer is rotation, and usually nobody has tested it."],
+          "Ask the room: for their own credential, which of these four events is most likely in the first year of operation? Usually the answer is rotation, and usually nobody has tested it."],
       caveats=["KERNEL/SIGN is explicitly not revocable — the code refuses. Know which aliases are protected before you plan an incident response.",
                "The 'key expired' column depends on the verifier actually checking the certificate validity window. Not every verifier does. Do not rely on expiry as an access control."],
       questions=["Can we invalidate every credential signed by one key? — Only by removing that certificate from publication, which is drastic and irreversible for holders. Status lists are the surgical tool."],
@@ -572,7 +577,7 @@ notes(s, ["The architectural point is that the Key Manager talks to one interfac
           "PKCS11 is the path you want in production. It uses the JDK's SunPKCS11 provider with a config file that points at the vendor's shared library and a slot. SoftHSM implements the same interface in software, which is why you can develop against PKCS11 locally and deploy against real hardware with the same code path — a genuinely good design decision.",
           "PKCS12 is what the shipped Certify configuration uses for local development: CERTIFY_PKCS12/local.p12 with password 'local'. That is fine on a laptop and unacceptable anywhere else. Say that plainly.",
           "Offline exists for deployments that only verify and never sign. JCE covers vendor providers such as CloudHSM.",
-          "For Dataprev, the decision to force is: which of these three boxes at the bottom, and who operates it. That has procurement lead time, so it should be decided early."],
+          "The decision to force is: which of these three boxes at the bottom, and who operates it. That has procurement lead time, so it should be decided early."],
       caveats=["With the embedded shape from topic 1, every Certify pod needs the HSM client library, the config file and the credentials. That is a real constraint on container images and on secret distribution — plan it with whoever runs the cluster.",
                "SoftHSM is not a security control. Its key material is a file on disk protected by a PIN in configuration. Use it to prove the PKCS11 path works, never to protect anything real."],
       questions=["Can different environments use different keystore types? — Yes, and they should: PKCS12 locally, PKCS11 everywhere else.",
@@ -601,9 +606,9 @@ callout(s, ML, yy, CW, "The row that decides it is the third one. With a file-ba
 notes(s, ["Frame this as a risk conversation rather than a technology preference, and let the room argue.",
           "Row 3 is the one to dwell on. Exfiltration versus use. A stolen file is forever; misuse of an HSM-held key ends when access ends. For a national issuer that distinction is the difference between rotating a key and repudiating years of credentials.",
           "Be balanced about the costs. An HSM is a new hard dependency with its own availability story, its own failover drill and its own backup procedure — and backup is genuinely hard and vendor-specific. Teams buy the hardware and never rehearse recovery.",
-          "The throughput row matters for Dataprev specifically: if issuance volume is high, the HSM signing rate is a design input, not an afterthought.",
+          "The throughput row matters wherever issuance volume is high, the HSM signing rate is a design input, not an afterthought.",
           "Land the ask: whoever owns infrastructure needs to start the HSM conversation now, because procurement and key ceremony take months, not sprints."],
-      caveats=["A managed cloud HSM removes some operational burden and adds a data-residency question — which is a live question for a Brazilian government issuer.",
+      caveats=["A managed cloud HSM removes some operational burden and adds a data-residency question — which is a live question for any government issuer.",
                "HSM does not protect against an authorised caller misusing the signing API. Role-based access and monitoring still matter; the hardware only stops exfiltration."],
       minutes="5 min")
 footer(s)
@@ -638,18 +643,18 @@ for i, (t, d, col) in enumerate(stages):
     if i < n - 1:
         arrow(s, x + bw + 0.02, y + 1.0, x + bw + gap - 0.02, y + 1.0, C['ink2'], 1.3)
 yy = y + 2.25
-callout(s, ML, yy, CW, "Steps 1 to 4 are engineering. **Step 5 is governance** — and nothing in the Key Manager can produce it. A perfectly resolvable key from an issuer nobody has agreed to trust is still worthless. Decide who maintains Dataprev's trust list, and how a verifier outside Dataprev learns about it.", kind='warn', size=10.6)
+callout(s, ML, yy, CW, "Steps 1 to 4 are engineering. **Step 5 is governance** — and nothing in the Key Manager can produce it. A perfectly resolvable key from an issuer nobody has agreed to trust is still worthless. Someone has to maintain the trust list, and verifiers outside the deployment have to learn about it.", kind='warn', size=10.6)
 yy = yy + 0.92
 codebox(s, ML, yy, 6.15, 2.05, [
  'GET /.well-known/did.json',
  '{',
  '  "@context": ["https://www.w3.org/ns/did/v1"],',
- '  "id": "did:web:certify.example.gov.br",',
- '  "assertionMethod": ["did:web:certify.example.gov.br"],',
+ '  "id": "did:web:certify.example.org",',
+ '  "assertionMethod": ["did:web:certify.example.org"],',
  '  "verificationMethod": [{',
- '    "id": "did:web:certify.example.gov.br#key-0",',
+ '    "id": "did:web:certify.example.org#key-0",',
  '    "type": "Ed25519VerificationKey2020",',
- '    "controller": "did:web:certify.example.gov.br",',
+ '    "controller": "did:web:certify.example.org",',
  '    "publicKeyMultibase": "z6Mk…"       // base58btc',
  '  }]',
  '}',
@@ -669,7 +674,7 @@ notes(s, ["Walk the five stages, then land on the callout: the first four are co
           "The DID document is generated by Certify's DIDDocumentUtil from the configured did-url and the certificates in the Key Manager. Ed25519 keys are published as Ed25519VerificationKey2020 with a base58btc publicKeyMultibase; others go out as JsonWebKey2020.",
           "The jwks.json endpoint is built by iterating the key-alias-mapper and calling getAllCertificates for each. That is why the highlighted second entry — last year's key — is there, and that is the mechanism that makes rotation non-breaking. Show this to anyone who doubts the retention argument from topic 3.",
           "did:web is worth explaining in one line: the DID resolves to an HTTPS URL on the domain in the identifier, so the security of the anchor is the security of that domain and its TLS. Whoever controls DNS for that host controls the trust anchor.",
-          "For Dataprev: the domain you choose here is a long-term commitment. Changing it later invalidates every credential that references it."],
+          "The domain chosen here is a long-term commitment. Changing it later invalidates every credential that references it."],
       caveats=["did:web trust is domain trust. Protect DNS, protect TLS certificate issuance for that host, and monitor the endpoint. A takeover of that hostname is a takeover of the issuer's identity.",
                "Certify serves did.json and jwks.json under /.well-known/. If a CDN, WAF or reverse proxy caches or challenges those paths, verifiers fail in ways that look like credential errors. This is a genuinely common production failure."],
       questions=["Should we use did:web or an X.509 chain from a national CA? — Both are legitimate; a government issuer often needs the CA chain for legal recognition. generateCSR plus uploadCertificate is the path."],
@@ -678,17 +683,17 @@ footer(s)
 
 # =================================================================== 16 ROTATING ANCHOR
 s, y = slide("Rotating a trust anchor without breaking anyone", kicker="Topic 5 — safe rotation",
-             sub="The order of operations matters. Do it in the wrong order and every verifier fails at once.")
+             sub="The order of operations matters — done in the wrong order, every verifier fails at once.")
 steps = [
- ("Publish first, sign later", "New key is generated and its certificate appears in `jwks.json` / `did.json` **before** anything is signed with it.",
+ ("Publication precedes signing", "The new key is generated and its certificate appears in `jwks.json` / `did.json` **before** anything is signed with it.",
   "Verifiers that cache the document have time to pick it up.", C['green']),
- ("Keep the old one published", "The previous certificate stays in the document. `getAllCertificates` does this for you — do not filter it out.",
+ ("The old certificate stays published", "The previous certificate remains in the document. `getAllCertificates` does this for you — do not filter it out.",
   "Everything signed last year keeps verifying.", C['primary']),
- ("Respect cache TTLs", "Verifiers and CDNs cache these documents. The overlap window must be longer than the longest cache TTL in the chain.",
+ ("Overlap exceeds cache TTLs", "Verifiers and CDNs cache these documents. The overlap window has to be longer than the longest cache TTL in the chain.",
   "A 30-day overlap and a 24-hour cache is comfortable. A 1-hour overlap is not.", C['amber']),
- ("Never reuse a `kid`", "A new key gets a new key id. Reusing one makes old credentials resolve to the wrong public key.",
+ ("A `kid` is never reused", "A new key gets a new key id. Reusing one makes old credentials resolve to the wrong public key.",
   "Silent, confusing verification failures.", C['red']),
- ("Monitor the endpoints", "`/.well-known/jwks.json` and `did.json` are production dependencies with an availability target.",
+ ("The endpoints are monitored", "`/.well-known/jwks.json` and `did.json` are production dependencies with an availability target.",
   "If they are down, verification is down — everywhere, for everyone.", C['violet']),
 ]
 cy = y
@@ -725,9 +730,9 @@ notes(s, ["This is a runbook, not a concept. Suggest the team turns it into an a
           "Rule 3 is the one that catches people. Overlap must exceed the longest cache TTL anywhere in the chain — verifier caches, CDN caches, and the Mimoto-style caches on the wallet side. If an overlap of 30 days sounds generous, remember that a badly configured CDN can serve a stale document for a week.",
           "Rule 4 deserves emphasis: kid is how a credential points at the key that signed it. Reuse breaks that pointer silently, and the resulting failures look like tampering rather than misconfiguration.",
           "Rule 5 is an availability ask, not a security one. Put jwks.json and did.json on the same monitoring and alerting as the credential endpoint. Most teams do not, and then spend a day debugging 'random verification failures'.",
-          "Ask: who at Dataprev owns these two URLs today? Frequently the answer is nobody, which is the finding."],
+          "Ask: who owns these two URLs today? Frequently the answer is nobody, which is the finding."],
       caveats=["Because rotation is lazy — triggered by the first signing request after the boundary — 'publish first, sign later' is not automatic. If you need a controlled rotation, generate the key deliberately and confirm it appears in the published documents before traffic reaches it.",
-               "If Dataprev uses an external CA chain rather than the self-signed ROOT, rotation also involves the CA's timelines. Add those to the plan."],
+               "Where an external CA chain is used rather than the self-signed ROOT, rotation also involves the CA's timelines. Add those to the plan."],
       minutes="6 min")
 footer(s)
 
@@ -761,7 +766,7 @@ codebox(s, ML + 6.46, y, 5.77, 1.92, [
  '  "statusPurpose": "revocation",',
  '  "statusListIndex": "11",',
  '  "statusListCredential":',
- '     "https://certify.example.gov.br/status/ab12"',
+ '     "https://certify.example.org/status/ab12"',
  '}',
 ], label="THE POINTER THE VERIFIER FOLLOWS", size=8.4, hl=[4, 6])
 yy = y + 2.02
@@ -779,7 +784,7 @@ notes(s, ["Start with the bitstring picture. It is the simplest possible idea: o
           "The privacy property is the reason this design exists. The verifier downloads the entire list, so the issuer's server sees a request for a list, not a request about a person. Contrast that with OCSP-style per-credential lookups, which leak exactly who is being checked and when. For a national credential that difference is material.",
           "In Certify, status list credentials are rows in the database with a vc_document column, served by id. The default size is 16 KB of bitstring, and indices are handed out by a database index provider. Allowed status purposes are configured — the shipped configuration allows 'revocation'.",
           "Draw attention to step 5: the status list is itself a Verifiable Credential and it is re-signed every time a bit changes. That is the hook into the next slide.",
-          "Ask: who at Dataprev will have authority to flip a bit, and through what interface? Revocation authority is a governance question that usually has no owner on day one."],
+          "Ask: who will have authority to flip a bit, and through what interface? Revocation authority is a governance question that usually has no owner on day one."],
       caveats=["The verifier must actually check status. Nothing forces it. If your verifiers skip the check, revocation does nothing — and note that Inji Wallet does not perform revocation checking today, so this lands on the verifier side.",
                "Downloading a full list costs bandwidth. 16 KB is small, but at national scale you will have many lists; plan caching and CDN behaviour, and remember caching delays revocation."],
       minutes="6 min")
@@ -807,7 +812,7 @@ rows = [
  ["**Who acts**", "An administrator with revocation authority", "An operator with Key Manager access"],
  ["**Verifier sees**", "`statusListIndex` bit set to 1", "A new `kid` on newly issued credentials"],
  ["**Reversible?**", "++Yes — clear the bit", "!!No — the old key is not reinstated as current"],
- ["**Use it when**", "A credential was issued in error, or the holder's entitlement ended", "A key is suspected compromised, or a scheduled rotation is due"],
+ ["**Applies when**", "A credential was issued in error, or the holder's entitlement ended", "A key is suspected compromised, or a scheduled rotation is due"],
  ["**Does NOT do**", "!!Stop a verifier that never checks status", "!!Invalidate anything already signed"],
 ]
 table(s, ML, yy, CW, ["", "Status list revocation", "Key revocation (`PUT /revokeKey`)"], rows,
@@ -816,7 +821,7 @@ notes(s, ["The left card is the non-obvious dependency and the reason this slide
           "Read the property names out: mosip.certify.status-list.signature-crypto-suite defaults to Ed25519Signature2020 and mosip.certify.status-list.key-manager-ref-id defaults to ED25519_SIGN. Those are real defaults in the shipped configuration.",
           "The comparison table is the takeaway. Print it. The 'Reversible?' row is worth pausing on — status list revocation is reversible by clearing a bit; key revocation is not reversible in the sense people expect, because the old key does not become current again.",
           "The last row is the honest one. Neither mechanism does the thing people most often assume: status lists do nothing if verifiers skip the check, and key revocation does nothing about already-issued credentials."],
-      caveats=["Suspension versus revocation: the status purpose is configurable, and the shipped configuration allows only 'revocation'. If Dataprev needs suspension — temporary withdrawal — that is a configuration change plus a verifier-side behaviour to agree.",
+      caveats=["Suspension versus revocation: the status purpose is configurable, and the shipped configuration allows only 'revocation'. Where suspension is needed — temporary withdrawal — that is a configuration change plus a verifier-side behaviour to agree.",
                "Re-signing a status list on every bit change means status list updates are signing operations. At high revocation volume that is HSM load; batch if you can."],
       questions=["If a signing key is compromised, do we revoke every credential it signed via status lists? — That is exactly the question in topic 8, and usually the answer is yes, in batches."],
       minutes="5 min")
@@ -857,8 +862,8 @@ table(s, ML, yy, CW, ["Isolation dimension", "How strong", "Why"], rows,
 notes(s, ["Be precise here, because 'multi-tenant' means different things to different people and the honest answer is 'logically isolated, physically shared'.",
           "The top three rows are genuinely strong: different app_id gives you different module keys, different policy and different published certificates. A verifier can pin exactly one tenant's key and ignore the rest.",
           "The bottom three rows are the caveats. One database, one keystore configuration, one host. If the threat model includes 'one tenant's operator should not be able to reach another tenant's keys', logical separation on a shared instance is not enough — you need separate Key Manager instances, and probably separate HSM partitions.",
-          "For Dataprev the question is concrete: will different Brazilian agencies issue through one Certify deployment or several? If several agencies with different legal accountability share one instance, expect that to be challenged in a security review."],
-      caveats=["Being trusted outside Dataprev is a separate question from isolation — it is on the next slide.",
+          "The question is concrete: will different agencies issue through one Certify deployment or several? If several agencies with different legal accountability share one instance, expect that to be challenged in a security review."],
+      caveats=["Being trusted outside the deployment is a separate question from isolation — it is on the next slide.",
                "Role configuration (mosip.role.keymanager.*) is a list of role names per endpoint. It does not express 'this caller may only use these aliases'. If you need that, it is additional work."],
       minutes="5 min")
 footer(s)
@@ -876,7 +881,7 @@ cards = [
  ("A published profile", ["Which formats, which algorithms, which `kid` resolution path.",
                           "Credential types and their claim definitions.",
                           "Rotation cadence and overlap, so verifiers can size their caches."], C['violet']),
- ("A governance answer", ["Who may issue on behalf of Brazil, and who says so.",
+ ("A governance answer", ["Who may issue on behalf of the programme, and who says so.",
                           "How a verifier learns the list and how it is updated.",
                           "What happens, contractually, when a key is compromised."], C['green']),
 ]
@@ -896,13 +901,13 @@ for i, (t, pts, col) in enumerate(cards):
                   for q in parts if q], size=9.3, first=True, line_spacing=1.26)
         cy += 0.16 + max(1, -(-len(re.sub(r'[`*]', '', p_)) // 30)) * 0.155
 yy = y + 3.10
-callout(s, ML, yy, CW, "Three of these four are engineering work you can start this month. The fourth — governance — is the one that takes a year and blocks the others from mattering. **Name its owner before this session ends.**", kind='spec', size=10.8)
+callout(s, ML, yy, CW, "Three of these four are engineering work you can start this month. The fourth — governance — is the one that takes a year and blocks the others from mattering, and it needs a named owner.", kind='spec', size=10.8)
 yy += 0.85
 _, tf = tb(s, ML, yy, CW, 0.28)
-para(tf, "DISCUSSION — FOR DATAPREV, RIGHT NOW", size=9, color=C['accent'], bold=True, first=True)
-qs = ["Self-signed ROOT, or a chain to ICP-Brasil / another recognised CA?",
+para(tf, "DISCUSSION — FOR YOUR OWN DEPLOYMENT", size=9, color=C['accent'], bold=True, first=True)
+qs = ["Self-signed ROOT, or a chain to a nationally recognised CA?",
       "Which domain hosts the DID document, and who controls its DNS?",
-      "One Key Manager for all Brazilian issuers, or one per agency?",
+      "One Key Manager for all issuers, or one per agency?",
       "Who is authorised to revoke, and through which interface?"]
 for i, q in enumerate(qs):
     x = ML + (i % 2) * (CW / 2 + 0.10)
@@ -911,9 +916,9 @@ for i, q in enumerate(qs):
     _, t2 = tb(s, x + 0.34, yy2, CW / 2 - 0.50, 0.36)
     para(t2, q, size=10, color=C['ink2'], first=True)
 notes(s, ["Close topic 7 by widening the frame: everything in this session makes credentials verifiable, and verifiability is necessary but not sufficient. Acceptance is a governance product.",
-          "The 'recognised chain' card is where a government issuer usually differs from a pilot. A self-signed root is fine while Dataprev is both issuer and verifier. The moment a bank, an airline or another country has to accept the credential, they will ask whose CA signed it. generateCSR plus uploadCertificate is the mechanism; the CA relationship is the work.",
+          "The 'recognised chain' card is where a government issuer usually differs from a pilot. A self-signed root is fine while one organisation is both issuer and verifier. The moment a bank, an airline or another country has to accept the credential, they will ask whose CA signed it. generateCSR plus uploadCertificate is the mechanism; the CA relationship is the work.",
           "Run the four discussion questions as an actual discussion. Capture answers and owners on a flipchart — they feed straight into Day 3's security hardening session.",
-          "If the room does not know the answer to the ICP-Brasil question, that is itself the most useful output of the session."],
+          "If the room does not know which CA applies, that is itself the most useful output of the session."],
       caveats=["Do not let 'we will decide the CA later' pass quietly. CA onboarding has months of lead time and it constrains the key algorithms you may use.",
                "The published profile is cheap to write and saves enormous time with every external partner. Offer to draft it."],
       minutes="5 min")
@@ -924,18 +929,18 @@ s, y = slide("A signing key is suspected compromised", kicker="Topic 8 — incid
              sub="What you do, in what order, and what each step actually achieves.")
 timeline(s, ML, y + 0.30, 7.60, [
  ("Contain", 0.0, 0.20, C['red'], "minutes", 0),
- ("Stop signing with it", 0.20, 0.40, C['amber'], "PUT /revokeKey", 0),
+ ("Signing stops", 0.20, 0.40, C['amber'], "PUT /revokeKey", 0),
  ("Assess", 0.40, 0.66, C['violet'], "what did it sign?", 1),
  ("Decide", 0.66, 0.84, C['primary'], "rotate, or repudiate?", 1),
  ("Publish", 0.84, 1.0, C['green'], "verifiers, holders", 2),
 ], years=5, hrow=0.54, vgap=0.74, xlabel="T+%d")
 _, tf = tb(s, ML + 7.95, y + 0.26, 4.28, 2.8)
 para(tf, "WHAT EACH STEP BUYS YOU", size=9, color=C['accent'], bold=True, first=True)
-for t, d in [("Contain", "Cut HSM access, rotate the HSM PIN, revoke the service credentials that could call the signing API."),
-             ("Stop signing", "`revokeKey` expires the key now. The next request generates a new one. **Already-issued credentials are untouched.**"),
-             ("Assess", "Use `cert_thumbprint` and your issuance logs to list every credential signed by that key."),
+for t, d in [("Contain", "HSM access is cut, the HSM PIN rotated, and the service credentials that could call the signing API revoked."),
+             ("Signing stops", "`revokeKey` expires the key now. The next request generates a new one. **Already-issued credentials are untouched.**"),
+             ("Assess", "`cert_thumbprint` plus the issuance logs give the list of every credential signed by that key."),
              ("Decide", "Rotate only, or withdraw what the key signed. See the next slide."),
-             ("Publish", "New certificate into `jwks.json` / `did.json`; tell verifiers what changed and when.")]:
+             ("Publish", "The new certificate goes into `jwks.json` / `did.json`, and verifiers are told what changed and when.")]:
     parts = re.split(r'(`[^`]+`|\*\*[^*]+\*\*)', d)
     ch = [(t + " — ", C['ink'], True)]
     for p in parts:
@@ -959,7 +964,7 @@ notes(s, ["Run this as a drill, not a lecture. Give the room the scenario — 'a
           "Step order matters. Containment comes before revocation: if the attacker still has HSM access, generating a new key just gives them a second key.",
           "The Assess step is where preparation pays. If you are not recording cert_thumbprint against every issued credential, you cannot answer 'what did this key sign', and every subsequent decision becomes guesswork. Make that a logging requirement today.",
           "The bottom table is the fork in the road, and it is decided by a choice made months earlier: HSM or file. That is the strongest practical argument for the HSM, stronger than any compliance checkbox.",
-          "Land the ask: Dataprev should rehearse this once, in a non-production environment, before go-live. A drill takes an afternoon and finds the gaps."],
+          "Land the ask: this is worth rehearsing once, in a non-production environment, before go-live. A drill takes an afternoon and finds the gaps."],
       caveats=["KERNEL/SIGN cannot be revoked through the API — the code refuses. Know which aliases are protected before the incident, not during it.",
                "Revocation is not reversible in the way people expect: the old key does not come back as current. If you revoke by mistake you get an unplanned rotation, which is survivable but noisy."],
       questions=["How fast can trust actually be withdrawn? — Stopping new signatures is immediate. Withdrawing already-issued credentials is bounded by verifier cache TTLs, so hours to days. Plan for days."],
@@ -970,16 +975,16 @@ footer(s)
 s, y = slide("Rotate or repudiate — and what it costs holders", kicker="Topic 8 — the hard call",
              sub="Three responses, three very different impacts on citizens who did nothing wrong.")
 opts = [
- ("Rotate only", "Stop using the key. Keep publishing its certificate.",
+ ("Rotate only", "The key stops being used. Its certificate stays published.",
   ["++No holder is affected", "++No re-issuance", "!!Anything the attacker signed stays valid",
-   "Use when: the key was HSM-held and the access window is known and empty"], C['green']),
- ("Rotate + status-list the suspects", "Stop using the key, and revoke the specific credentials you believe are fraudulent.",
+   "Applies when: the key was HSM-held and the access window is known and empty"], C['green']),
+ ("Rotate + status-list the suspects", "The key stops being used, and the specific credentials believed fraudulent are revoked.",
   ["++Only affected holders are impacted", "~~Needs a reliable list of what to revoke",
-   "~~Only works if verifiers check status", "Use when: you can identify the fraudulent credentials"], C['amber']),
- ("Repudiate the key", "Stop publishing its certificate entirely.",
+   "~~Only works if verifiers check status", "Applies when: the fraudulent credentials can be identified"], C['amber']),
+ ("Repudiate the key", "Its certificate stops being published entirely.",
   ["!!**Every** credential it ever signed stops verifying", "!!Mass re-issuance; citizens are locked out meanwhile",
    "++The only option that truly withdraws the attacker's signatures",
-   "Use when: the private key was copied"], C['red']),
+   "Applies when: the private key was copied"], C['red']),
 ]
 bw = (CW - 2 * 0.24) / 3
 for i, (t, d, pts, col) in enumerate(opts):
@@ -1008,8 +1013,8 @@ notes(s, ["This is the slide that connects the whole session together. Make the 
           "Walk the three options in order of increasing pain. The middle one — rotate plus targeted status-list revocation — is where you want to be, and it is only available if two things are true: you can identify the fraudulent credentials, and your verifiers actually check status.",
           "The third option is the one nobody plans for. Un-publishing a certificate breaks every credential it signed, including millions issued legitimately. For a national credential that is a front-page event.",
           "Now tie it back: whether you ever face option three is decided by the keystore choice made in topic 4, and whether option two is available is decided by the status list design in topic 6 and by verifier behaviour. Every earlier topic converges here.",
-          "Close topic 8 by asking the room to estimate, for Dataprev's planned volume, how long a mass re-issuance would take. The number is usually sobering and it makes the HSM business case by itself."],
-      caveats=["Option two depends on verifiers checking status. If a significant share of Brazilian verifiers do not, option two degrades towards option one and you are relying on the attacker not using what they stole.",
+          "Close topic 8 by asking the room to estimate, for their planned volume, how long a mass re-issuance would take. The number is usually sobering and it makes the HSM business case by itself."],
+      caveats=["Option two depends on verifiers checking status. If a significant share of verifiers do not, option two degrades towards option one and you are relying on the attacker not using what they stole.",
                "Do not treat option three as theoretical. Write the runbook for it, including holder communications, before you need it."],
       minutes="5 min")
 footer(s)
@@ -1051,11 +1056,11 @@ footer(s)
 
 # =================================================================== 24 NEXT
 s, y = slide("What to do with this — lab, decisions, references", kicker="Close",
-             sub="Three things to try in the afternoon lab, four decisions to start, and where to read further.")
-card(s, ML, y, 3.90, 3.30, "In this afternoon's lab", [
- "Find the `key_alias` and `key_store` rows behind the credential you issue, and match `cert_thumbprint` to the `kid` in the credential.",
- "Fetch `/.well-known/jwks.json` and `/.well-known/did.json` from your Certify instance and identify which key signed what.",
- "Call `PUT /revokeKey` on a throwaway alias, then issue again — watch a new key appear and confirm **the old credential still verifies**.",
+             sub="Three things worth trying hands-on, four decisions to start, and where to read further.")
+card(s, ML, y, 3.90, 3.30, "Worth trying hands-on", [
+ "Finding the `key_alias` and `key_store` rows behind an issued credential, and matching `cert_thumbprint` to the `kid` in the credential.",
+ "Fetching `/.well-known/jwks.json` and `/.well-known/did.json` from a Certify instance to identify which key signed what.",
+ "Calling `PUT /revokeKey` on a throwaway alias, then issuing again — a new key appears and **the old credential still verifies**.",
 ], accent=C['accent'], tint=C['accent_l'], size=9.8)
 card(s, ML + 4.15, y, 3.90, 3.30, "Decisions to start now", [
  "HSM or software keystore for production — and who procures and operates it.",
@@ -1063,7 +1068,7 @@ card(s, ML + 4.15, y, 3.90, 3.30, "Decisions to start now", [
  "Self-signed ROOT or a chain to a recognised CA; which domain hosts the DID document.",
  "Who holds revocation authority, and through which interface.",
 ], accent=C['primary'], tint=C['primary_l'], size=9.8)
-card(s, ML + 8.32, y, 3.91, 3.30, "Read the source, not the wiki", [
+card(s, ML + 8.32, y, 3.91, 3.30, "The source, not the wiki", [
  "`mosip/keymanager` — the service impl, the DB helper and the private-key decryptor.",
  "Its `db_scripts` DDL — three tables, each column commented.",
  "`mosip/inji-certify` — the DID document util, the JWKS service, the status list service.",
@@ -1071,10 +1076,10 @@ card(s, ML + 8.32, y, 3.91, 3.30, "Read the source, not the wiki", [
 ], accent=C['violet'], tint=C['violet_l'], size=9.6)
 yy = y + 3.55
 _, tf = tb(s, ML, yy, CW, 0.28)
-para(tf, "PARKED QUESTIONS — TO PICK UP ON DAY 3, SECURITY HARDENING", size=9,
+para(tf, "PARKED QUESTIONS", size=9,
      color=C['accent'], bold=True, first=True)
 qs = ["Rotation cadence per credential type", "HSM procurement and key ceremony",
-      "CA chain and ICP-Brasil", "Incident drill before go-live"]
+      "CA chain and the recognised CA", "Incident drill before go-live"]
 for i, q in enumerate(qs):
     x = ML + i * (CW / 4)
     rect(s, x, yy + 0.38, 0.16, 0.16, fill=None, line=C['accent'], lw=1.3)
@@ -1085,7 +1090,7 @@ notes(s, ["Close by making the session actionable rather than interesting.",
           "The four decisions have different lead times. HSM procurement is the longest — start it this week even if the rest is undecided.",
           "Carry the parked questions forward to Day 3's security hardening block so the thread is not dropped. Assign a name to each before people leave for lunch.",
           "If there is time before lunch, take open questions. If not, note them and open Day 2's recap with them."],
-      minutes="3 min, then lunch")
+      minutes="3 min")
 footer(s)
 
 # =================================================================== auto-fit
