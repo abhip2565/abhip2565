@@ -868,7 +868,110 @@ notes(s, ["Be precise here, because 'multi-tenant' means different things to dif
       minutes="5 min")
 footer(s)
 
-# =================================================================== 20 EXTERNAL TRUST
+# =================================================================== 20 CREDENTIAL CONFIG
+s, y = slide("Many credential types in one instance",
+             kicker="Topic 7 — credential configuration",
+             sub="`credential_config` is a table, not a property. One row per credential type, each pointing at its own signing key.")
+zone(s, ML, y, CW, 2.58, "ONE CERTIFY INSTANCE — one database, one embedded Key Manager, one issuer identity",
+     C['primary'], None)
+
+# --- col 1: credential_config rows
+x1, w1 = ML + 0.30, 3.30
+_, tf = tb(s, x1, y + 0.26, w1, 0.24)
+para(tf, "credential_config  (rows)", size=9.2, color=C['primary'], bold=True,
+     font=F_MONO, first=True)
+cfgs = [("Credential type A", "ldp_vc  ·  Ed25519Signature2020", C['accent']),
+        ("Credential type B", "ldp_vc  ·  EcdsaSecp256r1Signature2019", C['violet']),
+        ("Credential type C", "vc+sd-jwt  ·  ES256", C['green'])]
+for i, (t_, fmt, col) in enumerate(cfgs):
+    node(s, x1, y + 0.56 + i * 0.54, w1, 0.46, t_, sub=fmt, fill=C['surf'],
+         fg=col, tsize=9.6, ssize=8.0, border=col)
+
+# --- col 2: the key chooser
+x2, w2 = ML + 4.10, 2.70
+_, tf = tb(s, x2, y + 0.26, w2, 0.24)
+para(tf, "key-alias-mapper  (property)", size=9.2, color=C['primary'], bold=True,
+     font=F_MONO, first=True)
+codebox(s, x2, y + 0.56, w2, 1.46, [
+ "'EdDSA':  {CERTIFY_VC_SIGN_ED25519,",
+ "           ED25519_SIGN}",
+ "'ES256':  {CERTIFY_VC_SIGN_EC_R1,",
+ "           EC_SECP256R1_SIGN}",
+ "'RS256':  {CERTIFY_VC_SIGN_RSA, ''}",
+], size=7.6)
+
+
+# --- col 3: keymanager aliases
+x3, w3 = ML + 7.25, 2.25
+_, tf = tb(s, x3, y + 0.26, w3, 0.24)
+para(tf, "Key Manager aliases", size=9.2, color=C['primary'], bold=True, first=True)
+for i, (_t, _f, col) in enumerate(cfgs):
+    node(s, x3, y + 0.56 + i * 0.54, w3, 0.46, "app_id + ref_id",
+         sub="→ one key_alias row", fill=col, fg=C['white'], tsize=9.0,
+         ssize=7.6, mono=True)
+
+# --- col 4: what gets published
+x4, w4 = ML + 9.95, 1.95
+_, tf = tb(s, x4, y + 0.26, w4, 0.24)
+para(tf, "Published once", size=9.2, color=C['primary'], bold=True, first=True)
+node(s, x4, y + 0.56, w4, 0.68, "/.well-known/\ndid.json",
+     sub="from every row", fill=C['ink'], fg=C['white'], tsize=8.4, ssize=7.6, mono=True)
+node(s, x4, y + 1.34, w4, 0.68, "/.well-known/\njwks.json",
+     sub="from the property", fill=C['ink2'], fg=C['white'], tsize=8.4, ssize=7.6, mono=True)
+
+# --- arrows
+arrow(s, x1 + w1 + 0.06, y + 1.20, x2 - 0.06, y + 1.20, C['muted'], 1.4)
+arrow(s, x2 + w2 + 0.06, y + 1.20, x3 - 0.06, y + 1.20, C['muted'], 1.4)
+arrow(s, x3 + w3 + 0.06, y + 1.26, x4 - 0.06, y + 1.26, C['muted'], 1.4)
+
+# --- the resolution chain, spelled out once instead of three cramped labels
+_, tf = tb(s, ML + 0.30, y + 2.16, CW - 0.60, 0.28, wrap=False,
+           anchor=MSO_ANCHOR.MIDDLE)
+A = "  \u2192  "
+chain = [("RESOLUTION   ", C['muted'], True),
+         ("signature_crypto_suite", C['accent'], False, False, F_MONO),
+         (A, C['muted'], True),
+         ("signature_algo", C['accent'], False, False, F_MONO),
+         (A + "allow-listed in ", C['muted'], True),
+         ("key-alias-mapper", C['violet'], False, False, F_MONO),
+         (A, C['muted'], True),
+         ("app_id", C['violet'], False, False, F_MONO),
+         (" + ", C['muted'], True),
+         ("ref_id", C['violet'], False, False, F_MONO),
+         (A, C['muted'], True),
+         ("key_alias", C['green'], False, False, F_MONO),
+         (A + "every historical ", C['muted'], True),
+         ("kid", C['green'], False, False, F_MONO),
+         (" stays published", C['muted'], True)]
+rich(tf, chain, size=8.4, align=PP_ALIGN.CENTER, first=True)
+
+_tb_bottom = table(s, ML, y + 2.74, CW,
+  ["What you set", "Where it lives", "What it actually controls"],
+  [
+   ["`credential_type` + `context`, or `vct`, or `doctype`", "row", "Identifies the credential type. Unique per format — that is the constraint that lets many rows coexist"],
+   ["`signature_crypto_suite`", "row", "Picks the proof suite. If `signature_algo` is left blank it is derived from the suite"],
+   ["`key_manager_app_id` + `key_manager_ref_id`", "row", "**The signing key for this credential type.** Rejected at save time unless the pair appears under that algorithm in `key-alias-mapper`"],
+   ["`did_url`", "row", "Becomes `<did_url>#<kid>` in the VC's own `verificationMethod` — per credential type"],
+   ["`mosip.certify.data-provider-plugin.did-url`", "property", "The instance's `id`, `authentication` and `assertionMethod` in `/.well-known/did.json` — one value, whatever the rows say"],
+  ],
+  col_w=[3.5, 1.0, 7.7], fsize=8.8, row_h=0.34, head_h=0.30)
+
+callout(s, ML, _tb_bottom + 0.10, CW,
+        "The two published documents are built from **different sources**. `did.json` walks every `credential_config` row, collects each distinct `app_id`/`ref_id` and emits a `verificationMethod` per historical certificate. `jwks.json` never reads the table — it walks `key-alias-mapper` plus the `CERTIFY_SERVICE` alias. A key used by a credential type but missing from the mapper property would appear in one and not the other.",
+        kind='warn', size=9.6)
+notes(s, ["This slide answers the question people ask straight after the multi-tenant slide: if one instance is one issuer, does that mean one credential type? No — and the distinction matters for sizing the deployment.",
+          "Walk the diagram left to right. A credential_config row names a crypto suite. That implies a signature algorithm. The algorithm is looked up in the key-alias-mapper property, which is an allow-list of app_id/ref_id pairs. The row must name a pair that appears in that list, otherwise the save is rejected with KEY_CHOOSER_APP_REF_NOT_FOUND. Then that pair resolves to a real key inside the embedded Key Manager.",
+          "The reason for the allow-list is worth stating: it stops an operator with credential-config write access from pointing a credential type at an arbitrary key alias. The set of keys usable for signing credentials is fixed in properties, which are deployed, not in the database, which is editable at runtime.",
+          "Then the publishing half. This is the part that surprises people. did.json is generated by calling findAll() over credential_config, deduplicating by app_id and ref_id, and asking the Key Manager for every certificate ever issued for each. jwks.json ignores credential_config entirely and iterates the key-alias-mapper property instead, adding the CERTIFY_SERVICE alias at the end. Two documents, two sources.",
+          "Also flag the did_url split. Each row has its own did_url and that is what lands in the signed credential's verificationMethod. The instance-level did-url property is what the DID document calls itself. If those two disagree, a verifier resolving the credential's verificationMethod will not find it in the DID document. Keeping them aligned is a configuration discipline, not something the code enforces."],
+      caveats=["Credential configs are managed at runtime through /credential-configurations — POST, GET by id, PUT, DELETE. They are not a deployment artefact, so they need their own change control and their own backup story alongside the database.",
+               "The uniqueness constraints are per format: credential_type plus context plus format, sd_jwt_vct plus format, doctype plus format. Two rows for the same credential type in two different formats are legal and normal.",
+               "The key-alias-mapper check is skipped entirely when plugin-mode is VCIssuance, because in that mode the plugin returns an already-signed credential and Certify never picks a key.",
+               "None of this widens the data source. One instance still has exactly one DataProviderPlugin bean, so every credential type on the instance is built from the same backing data."],
+      minutes="6 min")
+footer(s)
+
+# =================================================================== 21 EXTERNAL TRUST
 s, y = slide("Being trusted outside your own deployment", kicker="Topic 7 — external trust",
              sub="Everything so far makes a credential verifiable. This is what makes it *accepted*.")
 cards = [
@@ -924,7 +1027,7 @@ notes(s, ["Close topic 7 by widening the frame: everything in this session makes
       minutes="5 min")
 footer(s)
 
-# =================================================================== 21 INCIDENT
+# =================================================================== 22 INCIDENT
 s, y = slide("A signing key is suspected compromised", kicker="Topic 8 — incident response",
              sub="What you do, in what order, and what each step actually achieves.")
 timeline(s, ML, y + 0.30, 7.60, [
@@ -971,7 +1074,7 @@ notes(s, ["Run this as a drill, not a lecture. Give the room the scenario — 'a
       minutes="6 min")
 footer(s)
 
-# =================================================================== 22 BLAST RADIUS
+# =================================================================== 23 BLAST RADIUS
 s, y = slide("Rotate or repudiate — and what it costs holders", kicker="Topic 8 — the hard call",
              sub="Three responses, three very different impacts on citizens who did nothing wrong.")
 opts = [
@@ -1019,7 +1122,7 @@ notes(s, ["This is the slide that connects the whole session together. Make the 
       minutes="5 min")
 footer(s)
 
-# =================================================================== 23 RECAP
+# =================================================================== 24 RECAP
 s, y = slide("The model in one slide", kicker="Recap",
              sub="If the room remembers six things from these 90 minutes, make it these.")
 items = [
@@ -1054,7 +1157,7 @@ notes(s, ["Read all six aloud, slowly. This is the last thing the room hears bef
       minutes="3 min")
 footer(s)
 
-# =================================================================== 24 NEXT
+# =================================================================== 25 NEXT
 s, y = slide("What to do with this — lab, decisions, references", kicker="Close",
              sub="Three things worth trying hands-on, four decisions to start, and where to read further.")
 card(s, ML, y, 3.90, 3.30, "Worth trying hands-on", [
