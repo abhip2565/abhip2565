@@ -269,6 +269,33 @@ def slide(title, kicker=None, sub=None, hl=None):
     return s, y
 
 # ---------------------------------------------------------------- sequence
+LIFELINE = RGBColor(0x7C, 0x90, 0xA6)
+
+
+def _label_width(txt, fs, numbered):
+    """Approximate rendered width, in inches, of a marked-up label."""
+    w = (4 if numbered else 0) * fs * 0.52 / 72.0
+    for pt in re.split(r'(`[^`]+`|\*\*[^*]+\*\*)', txt):
+        if not pt:
+            continue
+        if pt.startswith('`'):
+            w += (len(pt) - 2) * fs * 0.615 / 72.0
+        elif pt.startswith('**'):
+            w += (len(pt) - 4) * fs * 0.565 / 72.0
+        else:
+            w += len(pt) * fs * 0.525 / 72.0
+    return w
+
+
+def _fit_label(txt, fs, numbered, avail):
+    """Shrink the font until the label fits `avail` inches. Returns (font, width)."""
+    w = _label_width(txt, fs, numbered)
+    if w + 0.18 <= avail:
+        return fs, w
+    fs2 = max(6.4, fs * (avail - 0.18) / max(w, 0.01))
+    return fs2, _label_width(txt, fs2, numbered)
+
+
 def sequence(slide_, actors, steps, top=1.40, height=5.30, numbered=True,
              lane_colors=None, fsize=8.7):
     """Sequence diagram. steps: (from, to, label[, kind]) kind in req|resp|self|note."""
@@ -276,6 +303,7 @@ def sequence(slide_, actors, steps, top=1.40, height=5.30, numbered=True,
     lw = CW / n
     cx = [ML + lw * (i + 0.5) for i in range(n)]
     bw = min(2.12, lw - 0.16)
+    L, R = ML - 0.20, ML + CW + 0.20          # hard bounds for any label
     for i, a in enumerate(actors):
         col = (lane_colors or {}).get(i, C['primary'])
         sh = rect(slide_, cx[i] - bw / 2, top, bw, 0.42, fill=col,
@@ -288,22 +316,27 @@ def sequence(slide_, actors, steps, top=1.40, height=5.30, numbered=True,
         r = p.add_run(); r.text = a
         r.font.size = Pt(9.3); r.font.bold = True; r.font.name = F_SANS
         r.font.color.rgb = C['white']
-        line(slide_, cx[i], top + 0.42, cx[i], top + height, C['surf2'], 1.1, dash=2)
+        # lifeline: prominent, and anchored with a cap at each end
+        line(slide_, cx[i], top + 0.42, cx[i], top + height, LIFELINE, 1.6, dash=2)
+        rect(slide_, cx[i] - 0.05, top + 0.42, 0.10, 0.055, fill=LIFELINE)
+        rect(slide_, cx[i] - 0.05, top + height - 0.055, 0.10, 0.055, fill=LIFELINE)
     y0 = top + 0.60
     usable = height - 0.68
     step = usable / max(1, len(steps))
-    lab_h = min(0.30, step * 0.62)
+    lab_h = min(0.30, max(0.16, step * 0.62))
     for k, st in enumerate(steps):
         a, b, txt = st[0], st[1], st[2]
         kind = st[3] if len(st) > 3 else 'req'
         yy = y0 + k * step
         ya = yy + step * 0.80
         if kind == 'note':
-            rect(slide_, ML + 0.6, yy + 0.02, CW - 1.2, min(step * 0.86, 0.30),
+            nw = CW - 1.2
+            fs2, _ = _fit_label(txt, fsize, False, nw - 0.30)
+            rect(slide_, ML + 0.6, yy + 0.02, nw, min(step * 0.86, 0.30),
                  fill=C['amber_l'], shape=MSO_SHAPE.ROUNDED_RECTANGLE, adj=0.25)
-            _, tf = tb(slide_, ML + 0.7, yy + 0.02, CW - 1.4, min(step * 0.86, 0.30),
-                       anchor=MSO_ANCHOR.MIDDLE)
-            para(tf, txt, size=fsize, color=C['amber'], bold=True, italic=True,
+            _, tf = tb(slide_, ML + 0.7, yy + 0.02, nw - 0.20,
+                       min(step * 0.86, 0.30), wrap=False, anchor=MSO_ANCHOR.MIDDLE)
+            para(tf, txt, size=fs2, color=C['amber'], bold=True, italic=True,
                  align=PP_ALIGN.CENTER, first=True)
             continue
         dashed = (kind == 'resp')
@@ -313,34 +346,28 @@ def sequence(slide_, actors, steps, top=1.40, height=5.30, numbered=True,
             rect(slide_, x, ya - 0.10, 0.26, 0.16, fill=None, line=C['ink2'], lw=1.0)
             c = line(slide_, x + 0.26, ya + 0.06, x + 0.02, ya + 0.06, C['ink2'], 1.0)
             arrowhead(c, tail=True, size='sm')
-            est_w = (4 if numbered else 0) * fsize * 0.52 / 72.0
-            est_w += len(re.sub(r'`', '', txt)) * fsize * 0.545 / 72.0
-            boxw = est_w + 0.2
-            if x + 0.34 + boxw <= ML + CW + 0.15:
+            room_r, room_l = R - (x + 0.34), (x - 0.06) - L
+            avail = max(room_r, room_l)
+            fs2, ew = _fit_label(txt, fsize, numbered, avail)
+            boxw = min(ew + 0.18, avail)
+            if room_r >= boxw:
                 lx, la = x + 0.34, PP_ALIGN.LEFT
             else:
-                lx, la = max(ML - 0.15, x - 0.06 - boxw), PP_ALIGN.RIGHT
+                lx, la = max(L, x - 0.06 - boxw), PP_ALIGN.RIGHT
         else:
             x1, x2 = cx[a], cx[b]
             sgn = 1 if x2 > x1 else -1
-            c = line(slide_, x1 + sgn * 0.03, ya, x2 - sgn * 0.03, ya, fg, 1.3,
+            c = line(slide_, x1 + sgn * 0.03, ya, x2 - sgn * 0.03, ya, fg, 1.4,
                      dash=2 if dashed else None)
             arrowhead(c, tail=True, size='sm')
-            est_w = (4 if numbered else 0) * fsize * 0.52 / 72.0
-            for pt in re.split(r'(`[^`]+`)', txt):
-                if not pt:
-                    continue
-                if pt.startswith('`'):
-                    est_w += len(pt) * fsize * 0.605 / 72.0
-                else:
-                    est_w += len(pt) * fsize * 0.525 / 72.0
-            boxw = min(max(est_w + 0.22, 1.6), CW + 0.30)
+            fs2, ew = _fit_label(txt, fsize, numbered, R - L)
+            boxw = min(ew + 0.18, R - L)     # tight: never wider than the text needs
             mid = (x1 + x2) / 2.0
-            lx = max(ML - 0.18, min(mid - boxw / 2, W - MR + 0.18 - boxw))
+            lx = max(L, min(mid - boxw / 2, R - boxw))
             la = PP_ALIGN.CENTER
-        # opaque mask so the label never sits on a lifeline
+        # opaque mask, only as wide as the text, so lifelines stay visible either side
         rect(slide_, lx, yy + 0.005, boxw, lab_h, fill=C['white'])
-        _, tf = tb(slide_, lx + 0.06, yy + 0.02, boxw - 0.12, lab_h,
+        _, tf = tb(slide_, lx + 0.05, yy + 0.02, boxw - 0.10, lab_h,
                    wrap=False, anchor=MSO_ANCHOR.MIDDLE)
         ch = []
         if numbered:
@@ -355,7 +382,7 @@ def sequence(slide_, actors, steps, top=1.40, height=5.30, numbered=True,
                 ch.append((pt[2:-2], C['ink'], True))
             else:
                 ch.append((pt, C['ink2'] if not dashed else C['muted'], False))
-        rich(tf, ch, size=fsize, align=la, first=True, line_spacing=1.0)
+        rich(tf, ch, size=fs2, align=la, first=True, line_spacing=1.0)
 
 
 # ---------------------------------------------------------------- demo / exercise
