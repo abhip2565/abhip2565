@@ -1192,7 +1192,7 @@ codebox(s, ML + 7.66, y, 4.57, 2.25, [
  '// and iss in the payload',
  '"iss": "https://certify.example.gov.br"',
 ], label="WHERE THE HINTS LIVE", size=8.6)
-callout(s, ML + 7.66, y + 2.45, 4.57, "Rule of thumb: **`kid` selects, `iss` locates.** `kid` says which key; `iss` (or `x5c`) says where to get it.", kind='tip', size=10.0)
+callout(s, ML + 7.66, y + 2.45, 4.57, "Rule of thumb: `kid` **selects**, `iss` **locates**. `kid` says which key; `iss` (or `x5c`) says where to get it.", kind='tip', size=10.0)
 yy = y + 3.55
 rows = [
  ["`kid` missing", "Verifier cannot choose among several keys", "Always set `kid`, even with one key"],

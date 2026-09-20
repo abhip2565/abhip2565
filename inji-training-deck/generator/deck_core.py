@@ -346,9 +346,17 @@ def table(slide, x, y, w, headers, rows, col_w=None, fsize=9.5, hsize=9.5,
         c.vertical_anchor = MSO_ANCHOR.MIDDLE
         tf = c.text_frame; tf.word_wrap = True
         p = tf.paragraphs[0]; p.alignment = (align[j] if align else PP_ALIGN.LEFT)
-        r = p.add_run(); r.text = htxt
-        r.font.size = Pt(hsize); r.font.bold = True; r.font.name = F_SANS
-        r.font.color.rgb = C['white']
+        for seg in re.split(r'(`[^`]+`|\*\*[^*]+\*\*)', str(htxt)):
+            if not seg:
+                continue
+            fnt = F_SANS
+            if seg.startswith('`') and seg.endswith('`'):
+                seg = seg[1:-1]; fnt = F_MONO
+            elif seg.startswith('**') and seg.endswith('**'):
+                seg = seg[2:-2]
+            r = p.add_run(); r.text = seg
+            r.font.size = Pt(hsize); r.font.bold = True; r.font.name = fnt
+            r.font.color.rgb = C['white']
     for i, row in enumerate(rows):
         for j, val in enumerate(row):
             c = t.cell(i + 1, j)

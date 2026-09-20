@@ -1,12 +1,62 @@
-# Inji Wallet & Inji Web — Technical Enablement Workshop (Brazil)
+# Inji training decks
 
-A presentation-ready PowerPoint deck for a 4–5 hour technical training session aimed at
-implementers, architects, developers and integration engineers.
+Two presentation-ready PowerPoint decks built on a shared design system, plus the Python
+generator that produces them.
 
-**File:** `Inji-Wallet-and-Inji-Web-Technical-Enablement-Brazil.pptx`
-85 slides · 16:9 · full speaker notes on every slide (~14,000 words)
+| Deck | Slides | For |
+|---|---|---|
+| `Inji-Wallet-and-Inji-Web-Technical-Enablement-Brazil.pptx` | 85 | A 4–5 hour end-to-end technical enablement session for a Brazil implementation team |
+| `Inji-Key-Manager-Deep-Dive-Dataprev-Day1.pptx` | 24 | The 90-minute Key Manager block (Day 1, 11:35–13:05) of the Dataprev Inji deep-dive |
 
-## What it covers
+Both are 16:9 with full speaker notes on every slide (what to explain, caveats, likely
+audience questions, recommended time).
+
+---
+
+## Deck 2 — Key Manager deep dive (Dataprev, Day 1)
+
+**File:** `Inji-Key-Manager-Deep-Dive-Dataprev-Day1.pptx` · 24 slides · 90 minutes · ~5,500 words of notes
+
+Diagram-led, covering the eight topics in the session plan:
+
+| # | Topic | Time | Key visuals |
+|---|---|---|---|
+| 1 | Why a dedicated Key Manager | 10 min | Before/after custody diagram; where it sits in the Inji stack (shared service vs. embedded library) |
+| 2 | Key Manager architecture | 20 min | Three-tier key hierarchy; HSM vs. database custody; key-generation sequence; signing sequence; data model; API surface |
+| 3 | Key lifecycle | 15 min | Five-state lifecycle; rotation timeline with the `pre_expire_days` overlap; what happens to credentials already issued |
+| 4 | HSM integration | 12 min | Keystore-implementation diagram (PKCS11 / PKCS12 / Offline / JCE); software-vs-HSM trade-off table |
+| 5 | Trust anchors | 12 min | Five stages from key to trust; `did.json` and `jwks.json` anatomy; safe-rotation runbook |
+| 6 | Status list mechanics | 10 min | Bitstring diagram; issue→revoke→verify sequence; status list vs. key revocation |
+| 7 | Multi-issuer / multi-tenant | 6 min | Key-isolation diagram; isolation-strength table; external-trust requirements |
+| 8 | Key compromise | 5 min | Incident timeline; rotate-vs-repudiate blast radius |
+
+### Findings worth knowing before you present
+
+Verified against `mosip/keymanager` and `mosip/inji-certify`:
+
+- **Inji Certify embeds the key manager library** rather than calling a separate service —
+  `mosip.kernel.keymanager.hsm.*` are Certify's own properties. There is no Key Manager pod
+  in the Inji stack.
+- **Three tiers, not two:** ROOT → module/master key (in the HSM) → base/reference key
+  (generated in software, private key wrapped with the module public key, stored in
+  `keymgr.key_store`). "All private keys are in the HSM" is an over-claim.
+- **`PUT /revokeKey` does not destroy anything.** It sets `key_expire_dtimes` to one minute
+  ago, which forces an early rotation. Credentials already signed stay valid.
+- **Nothing is ever deleted.** `getAllCertificates` returns every certificate an alias has
+  ever had, and that is what `jwks.json` is built from — the reason rotation doesn't break
+  old credentials.
+- **Rotation is lazy.** No scheduler; the first signing request past the
+  `key_expire_dtimes − pre_expire_days` boundary generates the successor.
+- **Status list credentials are themselves signed VCs** (default `Ed25519Signature2020`,
+  key ref `ED25519_SIGN`), so the revocation mechanism has a key dependency of its own.
+- Shipped `key_policy_def` seed: ROOT 2920 days / 1125 pre-expire, BASE 730 / 30,
+  module app ids 1095 / 60.
+
+---
+
+## Deck 1 — Inji Wallet & Inji Web technical enablement (Brazil)
+
+### What it covers
 
 | Block | Time | Contents |
 |---|---|---|
@@ -26,7 +76,7 @@ implementers, architects, developers and integration engineers.
 
 Plus **8 demo checkpoints** spread through the day and **9 hands-on exercises**.
 
-## Design conventions
+### Design conventions
 
 - One recurring architecture diagram (Issuer → Mimoto → Inji Wallet → Credential Store →
   OpenID4VP → Verifier, with Inji Web attached to Mimoto) reappears with the component under
@@ -37,7 +87,7 @@ Plus **8 demo checkpoints** spread through the day and **9 hands-on exercises**.
   and a recommended time.
 - Slide text is kept short; the depth lives in the notes.
 
-## Accuracy
+### Accuracy
 
 Technical statements were checked against the public MOSIP/Inji repositories
 (`inji-wallet`, `inji-web`, `mimoto`, `inji-vci-client`, `inji-openid4vp`, `vc-verifier`,
@@ -53,15 +103,29 @@ on the slide. Notable verified points that are easy to get wrong:
 
 Re-verify against the release you deploy before treating any of this as fixed.
 
-## Regenerating the deck
+---
+
+## Regenerating either deck
 
 ```bash
 pip install python-pptx
 cd generator
-python3 -c "exec(open('build.py').read()); from deck_core import prs; prs.save('../deck.pptx')"
-python3 check.py      # reports any slide whose content overflows the canvas
+
+# Brazil enablement deck
+python3 -c "exec(open('build.py').read()); from deck_core import prs; prs.save('../deck1.pptx')"
+
+# Key Manager deep dive
+python3 -c "exec(open('build_km.py').read()); from deck_core import prs; prs.save('../deck2.pptx')"
 ```
 
-`deck_core.py` holds the design system (colours, type, tables, code boxes, auto-fit),
-`deck_blocks.py` the composite blocks (cards, the architecture spine, sequence diagrams,
-demo checkpoints), and `build.py` the slide content.
+| File | Role |
+|---|---|
+| `deck_core.py` | Design system: colours, type, tables, code boxes with syntax highlighting, auto-fit pass |
+| `deck_blocks.py` | Composite blocks: bullets, cards, callouts, the recurring architecture spine, sequence diagrams, demo checkpoints |
+| `deck_km.py` | Extra primitives for the Key Manager deck: nodes, labelled arrows, trust zones, lifecycle strips, rotation timelines |
+| `build.py` | Slide content for deck 1 |
+| `build_km.py` | Slide content for deck 2 |
+| `check.py` | Reports any slide whose content overflows the canvas |
+
+Both builds end with `fit_all()`, which shrinks any slide whose content would run past the
+bottom margin, so content changes will not silently overflow.

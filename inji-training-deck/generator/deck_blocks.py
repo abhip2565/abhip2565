@@ -34,11 +34,12 @@ def bullets(slide, x, y, w, items, size=12.5, gap=0.085, bullet_col=None,
         chars_per_line = int((w - ind - 0.26) * (72.0 / (fs * 0.505)) * 0.96 * mono_pen)
         nlines = max(1, -(-len(txt) // max(18, chars_per_line)))
         hgt = nlines * (fs / 72.0) * 1.26 + 0.02
+        dot_y = cy + (fs / 72.0) * 0.52
         if lvl == 0:
-            d = rect(slide, x + ind + 0.025, cy + hgt / 2 - 0.045, 0.085, 0.085,
+            d = rect(slide, x + ind + 0.025, dot_y, 0.085, 0.085,
                      fill=bullet_col, shape=MSO_SHAPE.OVAL)
         else:
-            d = rect(slide, x + ind + 0.04, cy + hgt / 2 - 0.022, 0.09, 0.028,
+            d = rect(slide, x + ind + 0.04, dot_y + 0.028, 0.09, 0.028,
                      fill=C['faint'])
         _, tf = tb(slide, x + ind + 0.23, cy, w - ind - 0.23, hgt + 0.1)
         # inline bold via **..**
@@ -93,21 +94,21 @@ def callout(slide, x, y, w, text, kind='note', h=None, size=10.5, title=None):
     rect(slide, x, y, w, h, fill=bgc, shape=MSO_SHAPE.ROUNDED_RECTANGLE, adj=0.09)
     rect(slide, x, y, 0.05, h, fill=fg)
     _, tf = tb(slide, x + 0.22, y + 0.10, w - 0.4, h - 0.16)
+    parts = re.split(r'(\*\*[^*]+\*\*|`[^`]+`)', text)
+    ch = []
+    for pt in parts:
+        if not pt:
+            continue
+        if pt.startswith('**'):
+            ch.append((pt[2:-2], fg, True))
+        elif pt.startswith('`'):
+            ch.append((pt[1:-1], C['primary'], False, False, F_MONO))
+        else:
+            ch.append((pt, C['ink2'], False))
     if title:
         para(tf, title, size=size - 0.5, color=fg, bold=True, first=True)
-        para(tf, text, size=size, color=C['ink2'])
+        rich(tf, ch, size=size, line_spacing=1.22)
     else:
-        parts = re.split(r'(\*\*[^*]+\*\*|`[^`]+`)', text)
-        ch = []
-        for pt in parts:
-            if not pt:
-                continue
-            if pt.startswith('**'):
-                ch.append((pt[2:-2], fg, True))
-            elif pt.startswith('`'):
-                ch.append((pt[1:-1], C['primary'], False, False, F_MONO))
-            else:
-                ch.append((pt, C['ink2'], False))
         rich(tf, ch, size=size, first=True, line_spacing=1.22)
     return y + h
 
@@ -312,10 +313,13 @@ def sequence(slide_, actors, steps, top=1.40, height=5.30, numbered=True,
             rect(slide_, x, ya - 0.10, 0.26, 0.16, fill=None, line=C['ink2'], lw=1.0)
             c = line(slide_, x + 0.26, ya + 0.06, x + 0.02, ya + 0.06, C['ink2'], 1.0)
             arrowhead(c, tail=True, size='sm')
-            lx, la = x + 0.34, PP_ALIGN.LEFT
             est_w = (4 if numbered else 0) * fsize * 0.52 / 72.0
             est_w += len(re.sub(r'`', '', txt)) * fsize * 0.545 / 72.0
-            boxw = min(est_w + 0.2, CW - (lx - ML) - 0.05)
+            boxw = est_w + 0.2
+            if x + 0.34 + boxw <= ML + CW + 0.15:
+                lx, la = x + 0.34, PP_ALIGN.LEFT
+            else:
+                lx, la = max(ML - 0.15, x - 0.06 - boxw), PP_ALIGN.RIGHT
         else:
             x1, x2 = cx[a], cx[b]
             sgn = 1 if x2 > x1 else -1
@@ -341,12 +345,14 @@ def sequence(slide_, actors, steps, top=1.40, height=5.30, numbered=True,
         ch = []
         if numbered:
             ch.append(("%d  " % (k + 1), C['accent'], True))
-        for pt in re.split(r'(`[^`]+`)', txt):
+        for pt in re.split(r'(`[^`]+`|\*\*[^*]+\*\*)', txt):
             if not pt:
                 continue
             if pt.startswith('`'):
                 ch.append((pt[1:-1], C['primary'] if not dashed else C['muted'],
                            False, False, F_MONO))
+            elif pt.startswith('**'):
+                ch.append((pt[2:-2], C['ink'], True))
             else:
                 ch.append((pt, C['ink2'] if not dashed else C['muted'], False))
         rich(tf, ch, size=fsize, align=la, first=True, line_spacing=1.0)
