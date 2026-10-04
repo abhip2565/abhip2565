@@ -104,7 +104,7 @@ Inji powers real-world use cases like national identity, education certificates,
 
 - 📧 **Email:** [paul.apaul.abhishek.ap@gmail.com](mailto:paul.apaul.abhishek.ap@gmail.com)
 - 💼 **LinkedIn:** [abhishek-paul-93a8a2191](https://www.linkedin.com/in/abhishek-paul-93a8a2191)
-- 🌐 **Portfolio:** [space](abhishekpaul.space)
+- 🌐 **Portfolio:** [space](https://abhishekpaul.space)
 
 ---
 
